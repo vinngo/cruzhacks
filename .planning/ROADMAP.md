@@ -51,8 +51,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Problem input with text/image toggle and state management
-- [ ] 02-02-PLAN.md — AI SDK integration and Socratic chat API
-- [ ] 02-03-PLAN.md — Canvas screenshot capture and AI analysis integration
+- [ ] 02-02-PLAN.md — AI chat system with streaming responses and initial greeting
+- [ ] 02-03-PLAN.md — Canvas screenshot capture with debounced AI analysis
 
 ---
 
@@ -80,7 +80,7 @@ Plans:
 | Phase | Status | Completed |
 |-------|--------|-----------|
 | 1 - Foundation & Canvas | Complete | 2026-01-16 |
-| 2 - Problem Input & AI Integration | Not started | — |
+| 2 - Problem Input & AI Integration | In progress | — |
 | 3 - Guidance & Annotations | Not started | — |
 
 ---
