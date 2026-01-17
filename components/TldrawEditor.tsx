@@ -47,16 +47,26 @@ export default function TldrawEditor() {
   const handleMount = (editor: any) => {
     // Add welcome hint text if canvas is empty
     if (editor.getCurrentPageShapeIds().size === 0) {
+      const textShapeId = createShapeId('welcome')
       editor.createShapes([
         {
-          id: createShapeId('welcome'),
+          id: textShapeId,
           type: 'text',
           x: 200,
           y: 200,
           props: {
-            text: 'Start working on your problem here...',
             size: 'm',
             color: 'grey',
+          },
+        },
+      ])
+      // Update the text content after creation
+      editor.updateShapes([
+        {
+          id: textShapeId,
+          type: 'text',
+          props: {
+            text: 'Start working on your problem here...',
           },
         },
       ])
