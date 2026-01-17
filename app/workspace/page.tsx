@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Panel, Group, Separator } from "react-resizable-panels";
 import ProblemPanel from "@/components/workspace/ProblemPanel";
 import CanvasPanel from "@/components/workspace/CanvasPanel";
 
@@ -16,23 +15,18 @@ const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
 
 export default function WorkspacePage() {
   return (
-    <div className="h-screen w-screen overflow-hidden">
-      <Group orientation="horizontal" style={{ height: '100vh', width: '100vw' }}>
-        {/* Left: Problem Panel */}
-        <Panel defaultSize={20} minSize={15} maxSize={30}>
-          <ProblemPanel />
-        </Panel>
+    <div className="h-screen w-screen flex overflow-hidden">
+      {/* Left: Problem Panel (20% width) */}
+      <div className="w-1/5 h-full">
+        <ProblemPanel />
+      </div>
 
-        {/* Resize Handle */}
-        <Separator className="w-1 bg-gray-200 hover:bg-blue-400 transition-colors cursor-col-resize" />
-
-        {/* Center: Canvas Panel */}
-        <Panel defaultSize={80}>
-          <CanvasPanel>
-            <TldrawEditor />
-          </CanvasPanel>
-        </Panel>
-      </Group>
+      {/* Center: Canvas Panel (80% width) */}
+      <div className="w-4/5 h-full">
+        <CanvasPanel>
+          <TldrawEditor />
+        </CanvasPanel>
+      </div>
     </div>
   );
 }
