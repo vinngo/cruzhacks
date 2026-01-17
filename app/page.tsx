@@ -4,15 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import ChatInput from "@/components/landing/ChatInput";
+import { useProblem } from "@/lib/problem-context";
 
 export default function Home() {
-  const [problem, setProblem] = useState("");
+  const [problemText, setProblemText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const router = useRouter();
+  const { setProblem, setProblemImage } = useProblem();
 
   const handleSubmit = () => {
-    if (problem.trim() || image) {
+    if (problemText.trim() || image) {
       // Navigate to workspace
+      if (problemText.trim()) {
+        setProblem(problemText);
+      }
+      if (image) {
+        setProblemImage(image);
+      }
       router.push("/workspace");
     }
   };
@@ -37,8 +45,8 @@ export default function Home() {
 
         {/* Chat Input */}
         <ChatInput
-          value={problem}
-          onChange={setProblem}
+          value={problemText}
+          onChange={setProblemText}
           onSubmit={handleSubmit}
           image={image}
           onImageSelect={setImage}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ProblemProvider } from "@/lib/problem-context";
 
 export const metadata: Metadata = {
   title: "Socratic Whiteboard",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <ProblemProvider>{children}</ProblemProvider>
       </body>
     </html>
   );
