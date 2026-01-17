@@ -1,37 +1,9 @@
 "use client";
 
-import {
-  Tldraw,
-  createTLStore,
-  loadSnapshot,
-  getSnapshot,
-  createShapeId,
-  Editor,
-} from "tldraw";
+import { Tldraw, createTLStore, Editor } from "tldraw";
 import "tldraw/tldraw.css";
-import {
-  forwardRef,
-  useImperativeHandle,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { createScreenshotPartUtil } from "@/lib/utils";
-
-const STORAGE_KEY = "socratic-whiteboard-canvas";
-
-// Custom throttle function to avoid external dependencies
-function throttle(fn: Function, delay: number) {
-  let timeout: NodeJS.Timeout | null = null;
-  return (...args: any[]) => {
-    if (!timeout) {
-      timeout = setTimeout(() => {
-        fn(...args);
-        timeout = null;
-      }, delay);
-    }
-  };
-}
 
 export interface TldrawEditorRef {
   captureScreenshot: () => Promise<string[] | null>;
@@ -47,34 +19,16 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     const store = useMemo(() => createTLStore(), []);
     const editorRef = useRef<Editor | null>(null);
 
-    useLayoutEffect(() => {
-      // Load persisted state from localStorage
-      const persisted = localStorage.getItem(STORAGE_KEY);
-      if (persisted) {
-        try {
-          loadSnapshot(store, JSON.parse(persisted));
-        } catch (error) {
-          console.error("Failed to load canvas state:", error);
-        }
-      }
-
-      // Save to localStorage on changes (throttled to 500ms)
-      const cleanup = store.listen(
-        throttle(() => {
-          const snapshot = getSnapshot(store);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-          // Notify parent component of changes
-          if (onChange) {
-            onChange();
-          }
-        }, 500),
-      );
-
-      return cleanup;
-    }, [store, onChange]);
-
     const handleMount = (editor: Editor) => {
       editorRef.current = editor;
+
+      // Notify parent on canvas changes if onChange provided
+      if (onChange) {
+        const cleanup = store.listen(() => {
+          onChange();
+        });
+        return cleanup;
+      }
     };
 
     useImperativeHandle(ref, () => ({
