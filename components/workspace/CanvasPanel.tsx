@@ -51,7 +51,8 @@ export default function CanvasPanel() {
     }, 4000); // 4 seconds
 
     setDebounceTimer(timer);
-  }, [debounceTimer, setCanvasScreenshot]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setCanvasScreenshot]);
 
   return (
     <div className="h-full relative">

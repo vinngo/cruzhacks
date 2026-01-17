@@ -2,8 +2,26 @@
 
 import { Tldraw, createTLStore, Editor } from "tldraw";
 import "tldraw/tldraw.css";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import { createScreenshotPartUtil } from "@/lib/utils";
+
+// Throttle utility to limit onChange frequency
+function throttle(fn: Function, delay: number) {
+  let lastCall = 0;
+  return (...args: any[]) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  };
+}
 
 export interface TldrawEditorRef {
   captureScreenshot: () => Promise<string[] | null>;
@@ -19,16 +37,20 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     const store = useMemo(() => createTLStore(), []);
     const editorRef = useRef<Editor | null>(null);
 
+    // Set up throttled onChange listener
+    useEffect(() => {
+      if (!onChange) return;
+
+      const throttledOnChange = throttle(onChange, 500);
+      const cleanup = store.listen(() => {
+        throttledOnChange();
+      });
+
+      return cleanup;
+    }, [store, onChange]);
+
     const handleMount = (editor: Editor) => {
       editorRef.current = editor;
-
-      // Notify parent on canvas changes if onChange provided
-      if (onChange) {
-        const cleanup = store.listen(() => {
-          onChange();
-        });
-        return cleanup;
-      }
     };
 
     useImperativeHandle(ref, () => ({
