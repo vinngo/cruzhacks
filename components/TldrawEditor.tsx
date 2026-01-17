@@ -50,7 +50,7 @@ export default function TldrawEditor() {
   }
 
   return (
-    <div className="fixed inset-0">
+    <div className="w-full h-full">
       <Tldraw
         store={store}
         onMount={handleMount}
