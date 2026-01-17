@@ -17,18 +17,18 @@ const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
 export default function CanvasPanel() {
   const { setCanvasScreenshot } = useProblem();
   const editorRef = useRef<TldrawEditorRef>(null);
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
-    null,
-  );
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCanvasChange = useCallback(() => {
+    console.log("Canvas onChange triggered (throttled from TldrawEditor)");
+
     // Cancel previous timer if user resumes drawing (cancel-on-resume)
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
 
     // Set new debounce timer (4 seconds - middle of 3-5s range)
-    const timer = setTimeout(async () => {
+    debounceTimerRef.current = setTimeout(async () => {
       if (!editorRef.current) return;
 
       try {
@@ -49,9 +49,6 @@ export default function CanvasPanel() {
         console.error("Failed to capture screenshot:", error);
       }
     }, 4000); // 4 seconds
-
-    setDebounceTimer(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setCanvasScreenshot]);
 
   return (
