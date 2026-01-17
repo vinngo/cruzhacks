@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import ChatInput from '@/components/landing/ChatInput';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import ChatInput from "@/components/landing/ChatInput";
 
 export default function Home() {
-  const [problem, setProblem] = useState('');
+  const [problem, setProblem] = useState("");
   const router = useRouter();
 
   const handleSubmit = () => {
     if (problem.trim()) {
       // Navigate to workspace
-      router.push('/workspace');
+      router.push("/workspace");
     }
   };
 
@@ -21,17 +21,16 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="flex flex-col items-center justify-center gap-8 px-8 max-w-3xl"
       >
         {/* Heading */}
         <div className="text-center space-y-4">
           <h1 className="text-6xl font-semibold text-gray-900 tracking-tight">
-            Socratic Whiteboard
+            Socratical
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl">
-            An AI tutor that guides you through math problems using the Socratic method.
-            Describe your problem below to get started.
+            An intelligent whiteboard for visual problem solving.
           </p>
         </div>
 
