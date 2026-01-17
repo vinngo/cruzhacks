@@ -22,6 +22,13 @@ This phase does NOT include: canvas annotations, chat UI in workspace sidebar (t
 - Show image preview when uploaded, hide text field
 - User submits either text description or image as their problem
 
+### Image Handling
+- Store uploaded images as client-side object URLs using `URL.createObjectURL()`
+- Keep both the File object (for potential AI upload) and the object URL (for display)
+- Object URL enables immediate preview on landing page and display in workspace ProblemPanel
+- Session-only persistence (URLs expire on page refresh, no server upload in Phase 2)
+- Image displays in ProblemPanel using the object URL from context
+
 ### Behavior - Canvas Screenshot Capture
 - Trigger: Debounced after user pauses drawing/editing
 - Debounce timing: 2-3 seconds after last canvas change
