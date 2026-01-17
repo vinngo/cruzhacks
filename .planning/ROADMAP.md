@@ -47,7 +47,12 @@ Plans:
 5. AI analyzes canvas work against original problem and generates guiding questions (not answers)
 6. AI maintains conversation context across multiple interactions
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Problem input with text/image toggle and state management
+- [ ] 02-02-PLAN.md — AI SDK integration and Socratic chat API
+- [ ] 02-03-PLAN.md — Canvas screenshot capture and AI analysis integration
 
 ---
 
