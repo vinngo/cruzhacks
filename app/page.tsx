@@ -7,10 +7,11 @@ import ChatInput from "@/components/landing/ChatInput";
 
 export default function Home() {
   const [problem, setProblem] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const router = useRouter();
 
   const handleSubmit = () => {
-    if (problem.trim()) {
+    if (problem.trim() || image) {
       // Navigate to workspace
       router.push("/workspace");
     }
@@ -39,6 +40,8 @@ export default function Home() {
           value={problem}
           onChange={setProblem}
           onSubmit={handleSubmit}
+          image={image}
+          onImageSelect={setImage}
         />
 
         {/* Subtle hint */}
