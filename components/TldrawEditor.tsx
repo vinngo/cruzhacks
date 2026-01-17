@@ -11,15 +11,16 @@ import {
 } from "react";
 import { createScreenshotPartUtil } from "@/lib/utils";
 
-// Throttle utility to limit onChange frequency
-function throttle(fn: Function, delay: number) {
-  let lastCall = 0;
+// Debounce utility - only call after user stops making changes
+function debounce(fn: Function, delay: number) {
+  let timeoutId: NodeJS.Timeout | null = null;
   return (...args: any[]) => {
-    const now = Date.now();
-    if (now - lastCall >= delay) {
-      lastCall = now;
-      fn(...args);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
   };
 }
 
@@ -37,17 +38,22 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     const store = useMemo(() => createTLStore(), []);
     const editorRef = useRef<Editor | null>(null);
 
-    // Set up throttled onChange listener
-    useEffect(() => {
-      if (!onChange) return;
+    // Create stable debounced onChange function
+    const debouncedOnChange = useMemo(() => {
+      if (!onChange) return null;
+      return debounce(onChange, 1000); // 1 second debounce at tldraw level
+    }, [onChange]);
 
-      const throttledOnChange = throttle(onChange, 500);
+    // Set up debounced onChange listener
+    useEffect(() => {
+      if (!debouncedOnChange) return;
+
       const cleanup = store.listen(() => {
-        throttledOnChange();
+        debouncedOnChange();
       });
 
       return cleanup;
-    }, [store, onChange]);
+    }, [store, debouncedOnChange]);
 
     const handleMount = (editor: Editor) => {
       editorRef.current = editor;

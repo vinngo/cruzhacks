@@ -20,7 +20,7 @@ export default function CanvasPanel() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCanvasChange = useCallback(() => {
-    console.log("Canvas onChange triggered (throttled from TldrawEditor)");
+    console.log("Canvas onChange triggered (debounced from TldrawEditor)");
 
     // Cancel previous timer if user resumes drawing (cancel-on-resume)
     if (debounceTimerRef.current) {
