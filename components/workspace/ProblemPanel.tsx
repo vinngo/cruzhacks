@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { useProblem } from "@/lib/problem-context";
 
@@ -13,7 +15,7 @@ export default function ProblemPanel() {
         </p>
       </div>
     );
-  } else if (problemImage) {
+  } else if (problemImage && problemImage.url) {
     return (
       <div className="h-full bg-gray-50 p-6 overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-4 text-gray-900">Problem</h2>

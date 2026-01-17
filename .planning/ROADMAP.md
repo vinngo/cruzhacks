@@ -50,7 +50,7 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Problem input with text/image toggle and state management
+- [x] 02-01-PLAN.md — Problem input with text/image toggle and state management
 - [ ] 02-02-PLAN.md — AI SDK integration and Socratic chat API
 - [ ] 02-03-PLAN.md — Canvas screenshot capture and AI analysis integration
 

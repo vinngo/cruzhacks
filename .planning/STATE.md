@@ -9,24 +9,25 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 1 of 3 (Foundation & Canvas)
-Plan: 4 of 4 complete
-Status: Phase complete
-Last activity: 2026-01-17 — Completed 01-04-PLAN.md (Phase 1 complete)
+Phase: 2 of 3 (Problem Input & AI Integration)
+Plan: 1 of 3 complete
+Status: Phase in progress
+Last activity: 2026-01-16 — Completed 02-01-PLAN.md (Problem input & state management)
 
-Progress: ████░░░░░░ 100% (Phase 1)
+Progress: █░░░░░░░░░ 33% (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 10.0 min
+- Total plans completed: 5
+- Average duration: N/A (manual implementation)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-canvas | 4/4 (complete) | 39.5 min | 9.9 min |
+| 02-problem-input---ai-integration | 1/3 (in progress) | Manual | Manual |
 
 ## Accumulated Context
 
@@ -48,6 +49,10 @@ Progress: ████░░░░░░ 100% (Phase 1)
 | Pivot to flexbox layout from react-resizable-panels | 01-04 | Multiple rendering issues; flexbox achieves 20/80 split without complexity |
 | Remove welcome hint text | 01-04 | tldraw text shape API incompatible with simple programmatic insertion |
 | "Socratical" branding | 01-04 | Shorter, more distinctive than "Socratic Whiteboard" |
+| Client-side object URLs for images | 02-01 | URL.createObjectURL() enables preview/display without server upload |
+| React Context over Redux/Zustand | 02-01 | Simpler state management appropriate for 3-phase project scope |
+| Next.js Image with object URLs | 02-01 | Works without configuration; no optimization needed for client blobs |
+| Text OR image (mutually exclusive) | 02-01 | Clearer UX than allowing both simultaneously |
 
 ### Pending Todos
 
@@ -59,7 +64,7 @@ Progress: ████░░░░░░ 100% (Phase 1)
 
 ## Session Continuity
 
-Last session: 2026-01-17
-Stopped at: Completed 01-04-PLAN.md (Phase 1 complete)
+Last session: 2026-01-16
+Stopped at: Completed 02-01-PLAN.md (manual implementation)
 Resume file: None
-Next phase: Phase 2 - Problem Input & AI Integration
+Next up: Plan 02-02 - AI SDK integration and Socratic chat API

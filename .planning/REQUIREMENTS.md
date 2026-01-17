@@ -10,8 +10,8 @@ Requirements for hackathon demo. Each maps to roadmap phases.
 ### Initial Experience
 
 - [x] **INIT-01**: User sees landing page with centered chat input (ChatGPT/Claude style)
-- [ ] **INIT-02**: User can describe math problem via text in chat input
-- [ ] **INIT-03**: User can upload image of math problem
+- [x] **INIT-02**: User can describe math problem via text in chat input
+- [x] **INIT-03**: User can upload image of math problem
 - [x] **INIT-04**: User transitions to workspace view after submitting problem
 
 ### Canvas
@@ -95,8 +95,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | INIT-01 | Phase 1 | Complete |
-| INIT-02 | Phase 2 | Pending |
-| INIT-03 | Phase 2 | Pending |
+| INIT-02 | Phase 2 | Complete |
+| INIT-03 | Phase 2 | Complete |
 | INIT-04 | Phase 1 | Complete |
 | CANV-01 | Phase 1 | Complete |
 | CANV-02 | Phase 2 | Pending |
