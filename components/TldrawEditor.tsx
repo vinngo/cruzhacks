@@ -1,32 +1,40 @@
 "use client";
 
-import { Tldraw, createTLStore, Editor } from "tldraw";
+import {
+  Tldraw,
+  createTLStore,
+  loadSnapshot,
+  getSnapshot,
+  createShapeId,
+  Editor,
+} from "tldraw";
 import "tldraw/tldraw.css";
 import {
   forwardRef,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
-  useEffect,
 } from "react";
 import { createScreenshotPartUtil } from "@/lib/utils";
 
-// Debounce utility - only call after user stops making changes
-function debounce(fn: Function, delay: number) {
-  let timeoutId: NodeJS.Timeout | null = null;
+const STORAGE_KEY = "socratic-whiteboard-canvas";
+
+// Custom throttle function to avoid external dependencies
+function throttle(fn: Function, delay: number) {
+  let timeout: NodeJS.Timeout | null = null;
   return (...args: any[]) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        fn(...args);
+        timeout = null;
+      }, delay);
     }
-    timeoutId = setTimeout(() => {
-      fn(...args);
-    }, delay);
   };
 }
 
 export interface TldrawEditorRef {
   captureScreenshot: () => Promise<string[] | null>;
-  getEditor: () => Editor | null;
 }
 
 export interface CustomTldrawEditorProps {
@@ -38,22 +46,31 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     const store = useMemo(() => createTLStore(), []);
     const editorRef = useRef<Editor | null>(null);
 
-    // Create stable debounced onChange function
-    const debouncedOnChange = useMemo(() => {
-      if (!onChange) return null;
-      return debounce(onChange, 1000); // 1 second debounce at tldraw level
-    }, [onChange]);
+    useLayoutEffect(() => {
+      // Load persisted state from localStorage
+      const persisted = localStorage.getItem(STORAGE_KEY);
+      if (persisted) {
+        try {
+          loadSnapshot(store, JSON.parse(persisted));
+        } catch (error) {
+          console.error("Failed to load canvas state:", error);
+        }
+      }
 
-    // Set up debounced onChange listener
-    useEffect(() => {
-      if (!debouncedOnChange) return;
-
-      const cleanup = store.listen(() => {
-        debouncedOnChange();
-      });
+      // Save to localStorage on changes (throttled to 500ms)
+      const cleanup = store.listen(
+        throttle(() => {
+          const snapshot = getSnapshot(store);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+          // Notify parent component of changes
+          if (onChange) {
+            onChange();
+          }
+        }, 500),
+      );
 
       return cleanup;
-    }, [store, debouncedOnChange]);
+    }, [store, onChange]);
 
     const handleMount = (editor: Editor) => {
       editorRef.current = editor;
@@ -79,7 +96,6 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
           return null;
         }
       },
-      getEditor: () => editorRef.current,
     }));
 
     return (
