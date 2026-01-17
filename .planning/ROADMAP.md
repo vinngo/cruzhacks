@@ -26,10 +26,10 @@ This roadmap delivers a working AI-powered math tutoring demo in 3 phases over ~
 **Plans:** 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project foundation (Next.js + dependencies + Tailwind)
-- [ ] 01-02-PLAN.md — Landing page with chat input and page transitions
-- [ ] 01-03-PLAN.md — Workspace layout and tldraw canvas integration
-- [ ] 01-04-PLAN.md — Navigation integration and user flow verification
+- [x] 01-01-PLAN.md — Project foundation (Next.js + dependencies + Tailwind)
+- [x] 01-02-PLAN.md — Landing page with chat input and page transitions
+- [x] 01-03-PLAN.md — Workspace layout and tldraw canvas integration
+- [x] 01-04-PLAN.md — Navigation integration and user flow verification
 
 ---
 
@@ -74,7 +74,7 @@ Plans:
 
 | Phase | Status | Completed |
 |-------|--------|-----------|
-| 1 - Foundation & Canvas | Not started | — |
+| 1 - Foundation & Canvas | Complete | 2026-01-16 |
 | 2 - Problem Input & AI Integration | Not started | — |
 | 3 - Guidance & Annotations | Not started | — |
 

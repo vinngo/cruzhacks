@@ -9,17 +9,17 @@ Requirements for hackathon demo. Each maps to roadmap phases.
 
 ### Initial Experience
 
-- [ ] **INIT-01**: User sees landing page with centered chat input (ChatGPT/Claude style)
+- [x] **INIT-01**: User sees landing page with centered chat input (ChatGPT/Claude style)
 - [ ] **INIT-02**: User can describe math problem via text in chat input
 - [ ] **INIT-03**: User can upload image of math problem
-- [ ] **INIT-04**: User transitions to workspace view after submitting problem
+- [x] **INIT-04**: User transitions to workspace view after submitting problem
 
 ### Canvas
 
-- [ ] **CANV-01**: User can draw and write freely on tldraw canvas
+- [x] **CANV-01**: User can draw and write freely on tldraw canvas
 - [ ] **CANV-02**: Canvas captures screenshot when user pauses (debounced)
-- [ ] **CANV-03**: Canvas state persists during session
-- [ ] **CANV-04**: tldraw provides standard drawing tools (pen, shapes, eraser)
+- [x] **CANV-03**: Canvas state persists during session
+- [x] **CANV-04**: tldraw provides standard drawing tools (pen, shapes, eraser)
 
 ### AI Analysis
 
@@ -40,10 +40,10 @@ Requirements for hackathon demo. Each maps to roadmap phases.
 
 ### Workspace
 
-- [ ] **WORK-01**: Problem reference panel displays original problem
-- [ ] **WORK-02**: Main canvas area shows tldraw workspace
+- [x] **WORK-01**: Problem reference panel displays original problem
+- [x] **WORK-02**: Main canvas area shows tldraw workspace
 - [ ] **WORK-03**: Collapsible chat sidebar for AI conversation
-- [ ] **WORK-04**: Layout provides clear visual hierarchy (canvas primary)
+- [x] **WORK-04**: Layout provides clear visual hierarchy (canvas primary)
 
 ## v2 Requirements
 
@@ -94,14 +94,14 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INIT-01 | Phase 1 | Pending |
+| INIT-01 | Phase 1 | Complete |
 | INIT-02 | Phase 2 | Pending |
 | INIT-03 | Phase 2 | Pending |
-| INIT-04 | Phase 1 | Pending |
-| CANV-01 | Phase 1 | Pending |
+| INIT-04 | Phase 1 | Complete |
+| CANV-01 | Phase 1 | Complete |
 | CANV-02 | Phase 2 | Pending |
-| CANV-03 | Phase 1 | Pending |
-| CANV-04 | Phase 1 | Pending |
+| CANV-03 | Phase 1 | Complete |
+| CANV-04 | Phase 1 | Complete |
 | AI-01 | Phase 2 | Pending |
 | AI-02 | Phase 2 | Pending |
 | AI-03 | Phase 2 | Pending |
@@ -113,10 +113,10 @@ Which phases cover which requirements. Updated by create-roadmap.
 | ANNO-04 | Phase 3 | Pending |
 | ANNO-05 | Phase 3 | Pending |
 | ANNO-06 | Phase 3 | Pending |
-| WORK-01 | Phase 1 | Pending |
-| WORK-02 | Phase 1 | Pending |
+| WORK-01 | Phase 1 | Complete |
+| WORK-02 | Phase 1 | Complete |
 | WORK-03 | Phase 3 | Pending |
-| WORK-04 | Phase 1 | Pending |
+| WORK-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 23 total
