@@ -10,23 +10,23 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Phase: 1 of 3 (Foundation & Canvas)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-17 — Completed 01-02-PLAN.md
+Last activity: 2026-01-17 — Completed 01-03-PLAN.md
 
-Progress: ██░░░░░░░░ 50%
+Progress: ███░░░░░░░ 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 5.3 min
+- Total plans completed: 3
+- Average duration: 5.0 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-canvas | 2/4 | 10.5 min | 5.3 min |
+| 01-foundation-canvas | 3/4 | 14.5 min | 4.8 min |
 
 ## Accumulated Context
 
@@ -41,6 +41,10 @@ Progress: ██░░░░░░░░ 50%
 | ChatGPT/Claude aesthetic with centered input | 01-02 | Clean, familiar UX for initial problem entry |
 | template.tsx for page transitions | 01-02 | Enables exit animations (template re-renders on navigation) |
 | 300ms transition duration | 01-02 | Smooth transitions without feeling sluggish |
+| react-resizable-panels Group/Separator API | 01-03 | Library exports differ from documentation (verified via Node.js) |
+| Hide tldraw menus, keep toolbar | 01-03 | Minimal UI focus on canvas, toolbar needed for drawing tools |
+| 500ms throttle for localStorage | 01-03 | Balance performance vs data loss risk |
+| Welcome hint on empty canvas | 01-03 | Guide first-time users to start working |
 
 ### Pending Todos
 
@@ -53,5 +57,5 @@ Progress: ██░░░░░░░░ 50%
 ## Session Continuity
 
 Last session: 2026-01-17
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
