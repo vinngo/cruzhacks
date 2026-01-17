@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import ProblemPanel from "@/components/workspace/ProblemPanel";
 import CanvasPanel from "@/components/workspace/CanvasPanel";
+import { ChatPanel } from "@/components/workspace/ChatPanel";
 
 const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
   ssr: false,
@@ -26,6 +27,10 @@ export default function WorkspacePage() {
         <CanvasPanel>
           <TldrawEditor />
         </CanvasPanel>
+      </div>
+
+      <div className="w-1/5 h-full">
+        <ChatPanel />
       </div>
     </div>
   );
