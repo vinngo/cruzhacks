@@ -4,7 +4,26 @@ import {
   UIMessage,
   ModelMessage,
 } from "ai";
+import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/ai/prompt";
+
+// Define annotation tool schema for AI to propose canvas annotations
+const proposeAnnotationSchema = z.object({
+  type: z
+    .enum(["question", "hint"])
+    .describe(
+      "Type of annotation: question for Socratic questions, hint for scaffolding/partial solutions",
+    ),
+  text: z
+    .string()
+    .describe(
+      "The annotation text. Keep concise (1-2 sentences max). Questions should be open-ended. Hints should be partial (not complete answers).",
+    ),
+  positionHint: z
+    .enum(["top-left", "top-right", "bottom-left", "bottom-right", "center"])
+    .optional()
+    .describe("Rough position preference. Algorithm will avoid overlaps."),
+});
 
 export async function POST(req: Request) {
   try {

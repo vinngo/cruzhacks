@@ -35,6 +35,7 @@ function throttle(fn: Function, delay: number) {
 
 export interface TldrawEditorRef {
   captureScreenshot: () => Promise<string[] | null>;
+  getEditor: () => Editor | null;
 }
 
 export interface CustomTldrawEditorProps {
@@ -96,6 +97,7 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
           return null;
         }
       },
+      getEditor: () => editorRef.current,
     }));
 
     return (

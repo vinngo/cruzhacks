@@ -19,18 +19,18 @@ export default function WorkspacePage() {
 
   return (
     <div className="h-screen w-screen flex overflow-hidden">
-      {/* Left: Problem Panel (20% width) */}
+      {/* Left: Problem Panel (fixed 20% width) */}
       <div className="w-1/5 h-full">
         <ProblemPanel />
       </div>
 
-      {/* Center: Canvas Panel (60% width) */}
-      <div className="w-3/5 h-full">
+      {/* Center: Canvas Panel (flexible, expands when chat collapses) */}
+      <div className="flex-1 h-full">
         <CanvasPanel />
       </div>
 
-      {/* Right: Chat Panel (20% width) */}
-      <div className="w-1/5 h-full">
+      {/* Right: Chat Panel (controls its own width via isCollapsed state) */}
+      <div className="h-full">
         <ChatPanel />
       </div>
     </div>
