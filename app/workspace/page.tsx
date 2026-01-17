@@ -19,18 +19,18 @@ const TldrawEditor = dynamic(
 
 export default function WorkspacePage() {
   return (
-    <div className="h-screen w-full">
-      <Group orientation="horizontal" className="h-full w-full">
+    <div className="h-screen w-full flex">
+      <Group orientation="horizontal" style={{ height: '100%', width: '100%' }}>
         {/* Left: Problem Panel */}
-        <Panel defaultSize={20} minSize={15} maxSize={30} className="h-full">
+        <Panel defaultSize={20} minSize={15} maxSize={30}>
           <ProblemPanel />
         </Panel>
 
         {/* Resize Handle */}
-        <Separator className="w-1 bg-gray-200 hover:bg-blue-400 transition-colors cursor-col-resize" />
+        <Separator style={{ width: '4px' }} className="bg-gray-200 hover:bg-blue-400 transition-colors cursor-col-resize" />
 
         {/* Center: Canvas Panel */}
-        <Panel defaultSize={80} className="h-full">
+        <Panel defaultSize={80}>
           <CanvasPanel>
             <TldrawEditor />
           </CanvasPanel>
