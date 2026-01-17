@@ -47,15 +47,8 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     const editorRef = useRef<Editor | null>(null);
 
     useLayoutEffect(() => {
-      // Load persisted state from localStorage
-      const persisted = localStorage.getItem(STORAGE_KEY);
-      if (persisted) {
-        try {
-          loadSnapshot(store, JSON.parse(persisted));
-        } catch (error) {
-          console.error("Failed to load canvas state:", error);
-        }
-      }
+      // Clear canvas state on mount to ensure each problem starts fresh
+      localStorage.removeItem(STORAGE_KEY);
 
       // Save to localStorage on changes (throttled to 500ms)
       const cleanup = store.listen(
