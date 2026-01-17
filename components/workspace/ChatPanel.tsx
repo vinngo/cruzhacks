@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useProblem } from "@/lib/problem-context";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,10 @@ import { cn } from "@/lib/utils";
 import { DefaultChatTransport } from "ai";
 
 export function ChatPanel() {
-  const { problemText, problemImage } = useProblem();
+  const { problemText, problemImage, chatInitialized, initializeChat } =
+    useProblem();
   const [input, setInput] = useState("");
+  const greetingSentRef = useRef(false);
 
   const { messages, status, sendMessage } = useChat({
     transport: new DefaultChatTransport({
@@ -31,6 +33,22 @@ export function ChatPanel() {
   });
 
   const isLoading = status === "submitted" || status === "streaming";
+
+  // Send initial greeting when component mounts
+  useEffect(() => {
+    if (
+      !greetingSentRef.current &&
+      !chatInitialized &&
+      (problemText || problemImage?.url)
+    ) {
+      console.log("Triggering initial greeting");
+      greetingSentRef.current = true;
+      initializeChat();
+      // Send empty message to trigger AI greeting
+      sendMessage({ text: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatInitialized, problemText, problemImage?.url]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

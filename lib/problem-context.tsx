@@ -8,6 +8,8 @@ export type ProblemContextType = {
   setProblem(text: string): void;
   setProblemImage(file: File): void;
   clearProblem(): void;
+  chatInitialized: boolean;
+  initializeChat(): void;
 };
 
 export const ProblemContext = createContext<ProblemContextType | null>(null);
@@ -40,6 +42,12 @@ export const ProblemProvider = ({
     setProblemImageState(null);
   };
 
+  const [chatInitialized, setChatInitialized] = useState(false);
+
+  const initializeChat = () => {
+    setChatInitialized(true);
+  };
+
   return (
     <ProblemContext.Provider
       value={{
@@ -48,6 +56,8 @@ export const ProblemProvider = ({
         setProblem,
         setProblemImage,
         clearProblem,
+        chatInitialized,
+        initializeChat,
       }}
     >
       {children}

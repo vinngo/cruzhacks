@@ -18,23 +18,40 @@ export async function POST(req: Request) {
       );
     }
 
+    // Filter out empty messages (used for initial greeting trigger)
+    const filteredMessages = messages.filter((msg) =>
+      msg.parts.some((part) => part.type === "text" && part.text.trim()),
+    );
+
+    // Check if this is the initial greeting (no valid messages)
+    const isInitialGreeting = filteredMessages.length === 0;
+
     // Build context-aware system message
     const systemMessage = `${SYSTEM_PROMPT}
 
 **Current Problem:**
-${problem?.text || "Image uploaded (description pending)"}
+${problem?.text || "Image uploaded (description pending)"}`;
 
-Provide ONE Socratic question to guide the student.`;
-
-    const result = streamText({
-      model: "openai/gpt-4.1-nano",
-      system: systemMessage,
-      messages: await convertToModelMessages(messages),
-      temperature: 0.7,
-      onError: ({ error }) => {
-        console.error("AI streaming error:", error);
-      },
-    });
+    const result = isInitialGreeting
+      ? streamText({
+          model: "openai/gpt-4.1-nano",
+          system: systemMessage,
+          prompt:
+            "Greet the student and ask ONE opening Socratic question to help them start thinking about this problem. Examples: 'What information does this problem give you?' or 'What do you think would be a good first step?' Keep it encouraging and open-ended.",
+          temperature: 0.7,
+          onError: ({ error }) => {
+            console.error("AI streaming error:", error);
+          },
+        })
+      : streamText({
+          model: "openai/gpt-4.1-nano",
+          system: systemMessage,
+          messages: await convertToModelMessages(filteredMessages),
+          temperature: 0.7,
+          onError: ({ error }) => {
+            console.error("AI streaming error:", error);
+          },
+        });
 
     return result.toUIMessageStreamResponse();
   } catch (error) {

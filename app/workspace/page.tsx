@@ -22,13 +22,14 @@ export default function WorkspacePage() {
         <ProblemPanel />
       </div>
 
-      {/* Center: Canvas Panel (80% width) */}
-      <div className="w-4/5 h-full">
+      {/* Center: Canvas Panel (60% width) */}
+      <div className="w-3/5 h-full">
         <CanvasPanel>
           <TldrawEditor />
         </CanvasPanel>
       </div>
 
+      {/* Right: Chat Panel (20% width) */}
       <div className="w-1/5 h-full">
         <ChatPanel />
       </div>
