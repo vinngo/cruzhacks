@@ -6,6 +6,7 @@ import CanvasPanel from "@/components/workspace/CanvasPanel";
 import { ChatPanel } from "@/components/workspace/ChatPanel";
 import { useProblem } from "@/lib/problem-context";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/workspace/Navbar";
 
 export default function WorkspacePage() {
   const { problemText, problemImage } = useProblem();
@@ -18,20 +19,26 @@ export default function WorkspacePage() {
   }, [problemText, problemImage, router]);
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden">
-      {/* Left: Problem Panel (fixed 20% width) */}
-      <div className="w-1/5 h-full">
-        <ProblemPanel />
-      </div>
+    <div className="h-screen w-screen flex flex-col overflow-hidden">
+      {/* Top: Navbar */}
+      <Navbar />
 
-      {/* Center: Canvas Panel (flexible, expands when chat collapses) */}
-      <div className="flex-1 h-full">
-        <CanvasPanel />
-      </div>
+      {/* Bottom: Panels (fills remaining space) */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Problem Panel (fixed 20% width) */}
+        <div className="w-1/5 h-full">
+          <ProblemPanel />
+        </div>
 
-      {/* Right: Chat Panel (controls its own width via isCollapsed state) */}
-      <div className="h-full">
-        <ChatPanel />
+        {/* Center: Canvas Panel (flexible, expands when chat collapses) */}
+        <div className="flex-1 h-full">
+          <CanvasPanel />
+        </div>
+
+        {/* Right: Chat Panel (controls its own width via isCollapsed state) */}
+        <div className="h-full">
+          <ChatPanel />
+        </div>
       </div>
     </div>
   );
