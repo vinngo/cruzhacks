@@ -10,6 +10,8 @@ export type ProblemContextType = {
   clearProblem(): void;
   chatInitialized: boolean;
   initializeChat(): void;
+  canvasScreenshot: string | null;
+  setCanvasScreenshot(screenshot: string | null): void;
 };
 
 export const ProblemContext = createContext<ProblemContextType | null>(null);
@@ -48,6 +50,14 @@ export const ProblemProvider = ({
     setChatInitialized(true);
   };
 
+  const [canvasScreenshot, setCanvasScreenshotState] = useState<string | null>(
+    null,
+  );
+
+  const setCanvasScreenshot = (screenshot: string | null) => {
+    setCanvasScreenshotState(screenshot);
+  };
+
   return (
     <ProblemContext.Provider
       value={{
@@ -58,6 +68,8 @@ export const ProblemProvider = ({
         clearProblem,
         chatInitialized,
         initializeChat,
+        canvasScreenshot,
+        setCanvasScreenshot,
       }}
     >
       {children}

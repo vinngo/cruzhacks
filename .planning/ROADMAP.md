@@ -71,7 +71,12 @@ Plans:
 6. User can dismiss annotation to remove it without leaving traces
 7. Complete demo flow: user submits problem, works on canvas, receives guidance, solves problem
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Collapsible chat sidebar + AI structured annotation proposals
+- [ ] 03-02-PLAN.md — Annotation overlay UI with approve/dismiss + smart positioning
+- [ ] 03-03-PLAN.md — Canvas integration (approve/dismiss handlers) + demo verification
 
 ---
 

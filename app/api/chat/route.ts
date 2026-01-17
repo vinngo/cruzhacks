@@ -1,15 +1,29 @@
-import { convertToModelMessages, streamText, UIMessage } from "ai";
+import {
+  convertToModelMessages,
+  streamText,
+  UIMessage,
+  ModelMessage,
+} from "ai";
 import { SYSTEM_PROMPT } from "@/lib/ai/prompt";
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json();
+    console.log("Request body keys:", Object.keys(body));
+    console.log("Screenshot present:", !!body.screenshot);
+    console.log("Screenshot length:", body.screenshot?.length);
+
     const {
       messages,
       problem,
+      screenshot,
     }: {
       messages: UIMessage[];
       problem: { text: string | undefined; imageUrl: string | undefined };
-    } = await req.json();
+      screenshot: string | undefined;
+    } = body;
+
+    console.log("screenshot:", screenshot);
 
     if (!messages || !Array.isArray(messages)) {
       return Response.json(
@@ -30,11 +44,31 @@ export async function POST(req: Request) {
     const systemMessage = `${SYSTEM_PROMPT}
 
 **Current Problem:**
-${problem?.text || "Image uploaded (description pending)"}`;
+${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**Canvas State:** The student's current work is shown in the canvas screenshot attached to the conversation." : ""}`;
+
+    // Convert filtered messages to model messages
+    const modelMessages = await convertToModelMessages(filteredMessages);
+
+    // Add screenshot as an image message if available
+    if (screenshot) {
+      modelMessages.push({
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Here is my current canvas work:",
+          },
+          {
+            type: "image",
+            image: screenshot,
+          },
+        ],
+      } as ModelMessage);
+    }
 
     const result = isInitialGreeting
       ? streamText({
-          model: "openai/gpt-4.1-nano",
+          model: "anthropic/claude-haiku-4.5",
           system: systemMessage,
           prompt:
             "Greet the student and ask ONE opening Socratic question to help them start thinking about this problem. Examples: 'What information does this problem give you?' or 'What do you think would be a good first step?' Keep it encouraging and open-ended.",
@@ -44,9 +78,9 @@ ${problem?.text || "Image uploaded (description pending)"}`;
           },
         })
       : streamText({
-          model: "openai/gpt-4.1-nano",
+          model: "anthropic/claude-haiku-4.5",
           system: systemMessage,
-          messages: await convertToModelMessages(filteredMessages),
+          messages: modelMessages,
           temperature: 0.7,
           onError: ({ error }) => {
             console.error("AI streaming error:", error);

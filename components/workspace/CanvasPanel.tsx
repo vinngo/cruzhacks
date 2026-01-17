@@ -1,13 +1,61 @@
-import { ReactNode } from 'react'
+"use client";
 
-interface CanvasPanelProps {
-  children: ReactNode
-}
+import { useRef, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import { useProblem } from "@/lib/problem-context";
+import { TldrawEditorRef } from "@/components/TldrawEditor";
 
-export default function CanvasPanel({ children }: CanvasPanelProps) {
+const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full bg-gray-50">
+      <p className="text-gray-500 text-lg">Loading canvas...</p>
+    </div>
+  ),
+});
+
+export default function CanvasPanel() {
+  const { setCanvasScreenshot } = useProblem();
+  const editorRef = useRef<TldrawEditorRef>(null);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
+    null,
+  );
+
+  const handleCanvasChange = useCallback(() => {
+    // Cancel previous timer if user resumes drawing (cancel-on-resume)
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    // Set new debounce timer (4 seconds - middle of 3-5s range)
+    const timer = setTimeout(async () => {
+      if (!editorRef.current) return;
+
+      try {
+        const result = await editorRef.current.captureScreenshot();
+        if (result && result.length > 1) {
+          // Extract screenshot from result array [description, screenshot]
+          const screenshot = result[1];
+          if (screenshot) {
+            console.log(
+              "Canvas screenshot captured, length:",
+              screenshot.length,
+            );
+            console.log("Screenshot format:", screenshot.substring(0, 50));
+            setCanvasScreenshot(screenshot);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to capture screenshot:", error);
+      }
+    }, 4000); // 4 seconds
+
+    setDebounceTimer(timer);
+  }, [debounceTimer, setCanvasScreenshot]);
+
   return (
     <div className="h-full relative">
-      {children}
+      <TldrawEditor ref={editorRef} onChange={handleCanvasChange} />
     </div>
-  )
+  );
 }

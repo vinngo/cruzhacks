@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useProblem } from "@/lib/problem-context";
 import { Button } from "@/components/ui/button";
@@ -12,24 +12,22 @@ import {
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import { cn } from "@/lib/utils";
-import { DefaultChatTransport } from "ai";
 
 export function ChatPanel() {
-  const { problemText, problemImage, chatInitialized, initializeChat } =
-    useProblem();
+  const {
+    problemText,
+    problemImage,
+    chatInitialized,
+    initializeChat,
+    canvasScreenshot,
+  } = useProblem();
   const [input, setInput] = useState("");
   const greetingSentRef = useRef(false);
+  const lastMessageTimeRef = useRef<number>(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const { messages, status, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: {
-        problem: {
-          text: problemText || undefined,
-          imageUrl: problemImage?.url || undefined,
-        },
-      },
-    }),
+    api: "/api/chat",
   });
 
   const isLoading = status === "submitted" || status === "streaming";
@@ -45,15 +43,71 @@ export function ChatPanel() {
       greetingSentRef.current = true;
       initializeChat();
       // Send empty message to trigger AI greeting
-      sendMessage({ text: "" });
+      sendMessage(
+        { text: "" },
+        {
+          body: {
+            problem: {
+              text: problemText || undefined,
+              imageUrl: problemImage?.url || undefined,
+            },
+            screenshot: canvasScreenshot || undefined,
+          },
+        },
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatInitialized, problemText, problemImage?.url]);
 
+  // Automatically analyze canvas when screenshot changes
+  useEffect(() => {
+    if (!canvasScreenshot || !chatInitialized) return;
+
+    const now = Date.now();
+    const timeSinceLastMessage = now - lastMessageTimeRef.current;
+
+    // Only auto-analyze if user hasn't sent a message in the last 5 seconds
+    // This avoids interrupting active typing
+    if (timeSinceLastMessage > 5000 && !isLoading) {
+      console.log(
+        "Auto-analyzing canvas screenshot, length:",
+        canvasScreenshot.length,
+      );
+      setIsAnalyzing(true);
+      // Send a canvas update marker (gets replaced in API with proper text)
+      sendMessage(
+        { text: "🎨" },
+        {
+          body: {
+            problem: {
+              text: problemText || undefined,
+              imageUrl: problemImage?.url || undefined,
+            },
+            screenshot: canvasScreenshot || undefined,
+          },
+        },
+      );
+      setTimeout(() => setIsAnalyzing(false), 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasScreenshot]);
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({ text: input });
+      lastMessageTimeRef.current = Date.now();
+      sendMessage(
+        { text: input },
+        {
+          body: {
+            problem: {
+              text: problemText || undefined,
+              imageUrl: problemImage?.url || undefined,
+            },
+            screenshot: canvasScreenshot || undefined,
+          },
+        },
+      );
       setInput("");
     }
   };
@@ -92,7 +146,9 @@ export function ChatPanel() {
                 >
                   {message.parts.map((part, index) => {
                     if (part.type === "text") {
-                      return <span key={index}>{part.text}</span>;
+                      // Display canvas update marker as just emoji
+                      const displayText = part.text === "🎨" ? "🎨" : part.text;
+                      return <span key={index}>{displayText}</span>;
                     }
                     return null;
                   })}
@@ -101,11 +157,13 @@ export function ChatPanel() {
             ))
           )}
 
-          {isLoading && (
+          {(isLoading || isAnalyzing) && (
             <div className="flex w-full justify-start">
               <div className="max-w-[85%] rounded-2xl bg-gray-100 px-4 py-2.5 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
-                  <span className="animate-pulse">AI is thinking</span>
+                  <span className="animate-pulse">
+                    {isAnalyzing ? "Analyzing canvas" : "AI is thinking"}
+                  </span>
                   <span className="animate-[pulse_1s_ease-in-out_0.2s_infinite]">
                     .
                   </span>

@@ -1,20 +1,22 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import ProblemPanel from "@/components/workspace/ProblemPanel";
 import CanvasPanel from "@/components/workspace/CanvasPanel";
 import { ChatPanel } from "@/components/workspace/ChatPanel";
-
-const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full bg-gray-50">
-      <p className="text-gray-500 text-lg">Loading canvas...</p>
-    </div>
-  ),
-});
+import { useProblem } from "@/lib/problem-context";
+import { useRouter } from "next/navigation";
 
 export default function WorkspacePage() {
+  const { problemText, problemImage } = useProblem();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!problemText || !problemImage) {
+      router.push("/");
+    }
+  }, [problemText, problemImage, router]);
+
   return (
     <div className="h-screen w-screen flex overflow-hidden">
       {/* Left: Problem Panel (20% width) */}
@@ -24,9 +26,7 @@ export default function WorkspacePage() {
 
       {/* Center: Canvas Panel (60% width) */}
       <div className="w-3/5 h-full">
-        <CanvasPanel>
-          <TldrawEditor />
-        </CanvasPanel>
+        <CanvasPanel />
       </div>
 
       {/* Right: Chat Panel (20% width) */}
