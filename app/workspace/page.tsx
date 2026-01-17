@@ -20,7 +20,7 @@ const TldrawEditor = dynamic(
 export default function WorkspacePage() {
   return (
     <div className="h-screen">
-      <Group direction="horizontal">
+      <Group orientation="horizontal">
         {/* Left: Problem Panel */}
         <Panel defaultSize={20} minSize={15} maxSize={30}>
           <ProblemPanel />
