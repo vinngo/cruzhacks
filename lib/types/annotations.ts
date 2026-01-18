@@ -4,7 +4,7 @@ export interface ProposedAnnotation {
   id: string;
   type: AnnotationType;
   text: string;
-  positionHint?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center";
+  positionHint?: "top-left" | "top-right" | "center";
   position?: {
     x: number;
     y: number;

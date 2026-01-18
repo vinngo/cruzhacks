@@ -69,14 +69,6 @@ function getPreferredPosition(
       x: viewport.w - ANNOTATION_WIDTH - PADDING,
       y: PADDING,
     },
-    "bottom-left": {
-      x: PADDING,
-      y: viewport.h - ANNOTATION_HEIGHT - PADDING,
-    },
-    "bottom-right": {
-      x: viewport.w - ANNOTATION_WIDTH - PADDING,
-      y: viewport.h - ANNOTATION_HEIGHT - PADDING,
-    },
     center: {
       x: (viewport.w - ANNOTATION_WIDTH) / 2,
       y: (viewport.h - ANNOTATION_HEIGHT) / 2,
@@ -95,8 +87,7 @@ function getAllPositions(viewport: {
   return [
     getPreferredPosition("top-right", viewport),
     getPreferredPosition("top-left", viewport),
-    getPreferredPosition("bottom-right", viewport),
-    getPreferredPosition("bottom-left", viewport),
+    getPreferredPosition("center", viewport),
   ];
 }
 

@@ -30,7 +30,7 @@ export function ChatPanel() {
   const [input, setInput] = useState("");
   const greetingSentRef = useRef(false);
   const lastMessageTimeRef = useRef<number>(0);
-  const processedMessageIdsRef = useRef<Set<string>>(new Set());
+  const processedToolCallIdsRef = useRef<Set<string>>(new Set());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [forceReprocess, setForceReprocess] = useState(0);
@@ -38,7 +38,7 @@ export function ChatPanel() {
   // Debug: Add window function to clear cache if needed
   useEffect(() => {
     (window as any).clearMessageCache = () => {
-      processedMessageIdsRef.current.clear();
+      processedToolCallIdsRef.current.clear();
       setForceReprocess(prev => prev + 1);
       console.log("🧹 Message cache cleared! Reprocessing...");
     };
@@ -63,15 +63,16 @@ export function ChatPanel() {
 
   useEffect(() => {
     console.log("🔄 Processing messages, total count:", messages.length);
-    console.log("🔄 Already processed:", processedMessageIdsRef.current.size);
+    console.log("🔄 Already processed tool calls:", processedToolCallIdsRef.current.size);
+    console.log("🔄 Is loading:", isLoading);
+
+    // Only process tool calls when not loading (message is complete)
+    if (isLoading) {
+      console.log("⏸️ Still loading, waiting for complete message...");
+      return;
+    }
 
     messages.forEach((message) => {
-      // Skip if already processed this message
-      if (processedMessageIdsRef.current.has(message.id)) {
-        console.log("⏭️ Skipping already processed message:", message.id);
-        return;
-      }
-
       if (message.role === "assistant" && message.parts) {
         console.log("🤖 Processing assistant message:", message.id);
         console.log("📦 Parts count:", message.parts.length);
@@ -98,8 +99,17 @@ export function ChatPanel() {
             part.type === "tool-proposeAnnotation";
 
           if (isToolCall) {
+            // Get the unique tool call ID
+            const toolCallId = "toolCallId" in part ? (part.toolCallId as string) : undefined;
+
+            // Skip if we've already processed this specific tool call
+            if (toolCallId && processedToolCallIdsRef.current.has(toolCallId)) {
+              console.log("⏭️ Skipping already processed tool call:", toolCallId);
+              return;
+            }
+
             foundToolCall = true;
-            console.log("🎯 Found proposeAnnotation tool call!");
+            console.log("🎯 Found proposeAnnotation tool call!", toolCallId);
 
             // Extract args from either 'args' or 'input' property
             const toolArgs = ("args" in part ? part.args : "input" in part ? part.input : null) as {
@@ -108,22 +118,38 @@ export function ChatPanel() {
               positionHint?:
                 | "top-left"
                 | "top-right"
-                | "bottom-left"
-                | "bottom-right"
                 | "center";
             } | null;
 
             if (toolArgs && typeof toolArgs === "object") {
               console.log("🎯 Tool args:", toolArgs);
-              const { type, text, positionHint } = toolArgs;
+              // Access properties directly (they may be non-enumerable or getters)
+              const type = (toolArgs as any).type as "question" | "hint";
+              const text = (toolArgs as any).text as string;
+              const positionHint = (toolArgs as any).positionHint as "top-left" | "top-right" | "center" | undefined;
+
+              console.log("🎯 Extracted values:", { type, text, positionHint });
+
+              if (!text) {
+                console.error("⚠️ Tool args missing text property!");
+                return;
+              }
+
               const annotation: ProposedAnnotation = {
                 id: crypto.randomUUID(), // Unique ID for each annotation
                 type,
                 text,
                 positionHint,
               };
+              console.log("🎯 Annotation created:", annotation);
               addProposedAnnotation(annotation);
-              console.log("✅ Proposed annotation added:", annotation);
+              console.log("✅ Proposed annotation added");
+
+              // Mark this specific tool call as processed
+              if (toolCallId) {
+                processedToolCallIdsRef.current.add(toolCallId);
+                console.log("✓ Marked tool call as processed:", toolCallId);
+              }
             } else {
               console.warn("⚠️ Tool call found but args/input missing or invalid");
             }
@@ -133,13 +159,9 @@ export function ChatPanel() {
         if (!foundToolCall) {
           console.log("⚠️ No tool calls found in this assistant message");
         }
-
-        // Mark message as processed
-        processedMessageIdsRef.current.add(message.id);
-        console.log("✓ Marked message as processed:", message.id);
       }
     });
-  }, [messages, addProposedAnnotation, forceReprocess]);
+  }, [messages, addProposedAnnotation, forceReprocess, isLoading]);
 
   // Send initial greeting when component mounts
   useEffect(() => {

@@ -123,8 +123,16 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
   ]);
 
   const handleApprove = (annotation: ProposedAnnotation) => {
+    console.log("🎯 handleApprove called with annotation:", annotation);
+
     if (!editorRef.current) {
       console.warn("Editor ref not available");
+      return;
+    }
+
+    // Validate annotation has text
+    if (!annotation.text) {
+      console.error("⚠️ Annotation missing text property:", annotation);
       return;
     }
 
@@ -137,6 +145,12 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
 
     // Convert annotation type to tldraw color
     const color = annotation.type === "question" ? "blue" : "yellow";
+
+    console.log("📝 Adding annotation to canvas:", {
+      text: annotation.text,
+      position: storedPosition,
+      color,
+    });
 
     // Add to canvas as text shape (addAnnotationToCanvas handles screen-to-page conversion)
     editorRef.current.addAnnotationToCanvas(

@@ -24,7 +24,7 @@ const proposeAnnotationTool = tool({
         "The annotation text. Keep concise (1-2 sentences max). Questions should be open-ended. Hints should be partial (not complete answers).",
       ),
     positionHint: z
-      .enum(["top-left", "top-right", "bottom-left", "bottom-right", "center"])
+      .enum(["top-left", "top-right", "center"])
       .optional()
       .describe("Rough position preference. Algorithm will avoid overlaps."),
   }),
