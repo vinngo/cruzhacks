@@ -150,14 +150,29 @@ export function ChatPanel() {
 
   // Automatically analyze canvas when screenshot changes
   useEffect(() => {
-    if (!canvasScreenshot || !chatInitialized) return;
+    console.log("🎨 Canvas screenshot effect triggered:", {
+      hasScreenshot: !!canvasScreenshot,
+      chatInitialized,
+      screenshotLength: canvasScreenshot?.length,
+    });
+
+    if (!canvasScreenshot || !chatInitialized) {
+      console.log("⏭️ Skipping canvas analysis:", {
+        noScreenshot: !canvasScreenshot,
+        notInitialized: !chatInitialized,
+      });
+      return;
+    }
 
     const now = Date.now();
     const timeSinceLastMessage = now - lastMessageTimeRef.current;
 
+    console.log("⏰ Time since last message:", timeSinceLastMessage, "ms");
+
     // Only auto-analyze if user hasn't sent a message in the last 5 seconds
     // This avoids interrupting active typing
     if (timeSinceLastMessage > 5000 && !isLoading) {
+      console.log("🚀 Sending canvas for AI analysis");
       setIsAnalyzing(true);
       // Send a canvas update marker (gets replaced in API with proper text)
       sendMessage(
@@ -173,6 +188,11 @@ export function ChatPanel() {
         },
       );
       setTimeout(() => setIsAnalyzing(false), 1000);
+    } else {
+      console.log("⏸️ Not sending canvas yet:", {
+        tooSoon: timeSinceLastMessage <= 5000,
+        isLoading,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasScreenshot]);
@@ -180,6 +200,13 @@ export function ChatPanel() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
+      console.log("📤 Sending user message with data:", {
+        text: input,
+        hasProblem: !!(problemText || problemImage?.url),
+        hasScreenshot: !!canvasScreenshot,
+        screenshotLength: canvasScreenshot?.length,
+      });
+
       lastMessageTimeRef.current = Date.now();
       sendMessage(
         { text: input },
