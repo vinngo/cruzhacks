@@ -119,7 +119,6 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
             proposeAnnotation: proposeAnnotationTool,
           },
           temperature: 0.7,
-          maxSteps: 5, // Allow tool calls in multi-step responses
           onStepFinish: ({ toolCalls }) => {
             console.log("🔧 Step finished, tool calls:", toolCalls);
           },
@@ -134,8 +133,8 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           tools: {
             proposeAnnotation: proposeAnnotationTool,
           },
+          toolChoice: "auto", // Let AI decide when to use tools
           temperature: 0.7,
-          maxSteps: 5, // Allow multiple tool calls per response
           onStepFinish: ({ toolCalls }) => {
             console.log("🔧 Step finished, tool calls:", toolCalls);
             if (toolCalls && toolCalls.length > 0) {

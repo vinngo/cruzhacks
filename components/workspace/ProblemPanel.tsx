@@ -8,7 +8,7 @@ export default function ProblemPanel() {
 
   if (problemText) {
     return (
-      <div className="h-full bg-gray-50 p-6 overflow-y-auto">
+      <div className="h-full bg-background p-6 overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-4 text-gray-900">Problem</h2>
         <p className="text-gray-600 leading-relaxed">
           {problemText ? problemText : "No problem selected"}
@@ -17,7 +17,7 @@ export default function ProblemPanel() {
     );
   } else if (problemImage && problemImage.url) {
     return (
-      <div className="h-full bg-gray-50 p-6 overflow-y-auto">
+      <div className="h-full bg-background p-6 overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-4 text-gray-900">Problem</h2>
         <Image
           src={problemImage.url}

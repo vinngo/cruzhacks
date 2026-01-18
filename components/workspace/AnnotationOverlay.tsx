@@ -154,34 +154,31 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
     removeProposedAnnotation(id);
   };
 
+  // Debug log for empty state
+  if (proposedAnnotations.length === 0) {
+    console.log("📍 No annotations to render");
+  }
+
   return (
     <>
-      {proposedAnnotations.length > 0 ? (
-        proposedAnnotations.map((annotation, index) => {
-          const position =
-            annotationPositions.get(annotation.id) ||
-            calculatedPositions[index];
-          console.log("🎯 Rendering annotation card:", {
-            id: annotation.id,
-            text: annotation.text,
-            position,
-          });
-          return (
-            <AnnotationCard
-              key={annotation.id}
-              annotation={annotation}
-              onApprove={() => handleApprove(annotation)}
-              onDismiss={() => handleDismiss(annotation.id)}
-              position={position}
-            />
-          );
-        })
-      ) : (
-        <div className="hidden">
-          {/* No annotations to display - this div helps with debugging */}
-          {console.log("📍 No annotations to render")}
-        </div>
-      )}
+      {proposedAnnotations.map((annotation, index) => {
+        const position =
+          annotationPositions.get(annotation.id) || calculatedPositions[index];
+        console.log("🎯 Rendering annotation card:", {
+          id: annotation.id,
+          text: annotation.text,
+          position,
+        });
+        return (
+          <AnnotationCard
+            key={annotation.id}
+            annotation={annotation}
+            onApprove={() => handleApprove(annotation)}
+            onDismiss={() => handleDismiss(annotation.id)}
+            position={position}
+          />
+        );
+      })}
     </>
   );
 }
