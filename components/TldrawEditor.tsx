@@ -21,7 +21,10 @@ import { createScreenshotPartUtil } from "@/lib/utils";
 const STORAGE_KEY = "socratic-whiteboard-canvas";
 
 // Custom throttle function to avoid external dependencies
-function throttle<T extends unknown[]>(fn: (...args: T) => void, delay: number) {
+function throttle<T extends unknown[]>(
+  fn: (...args: T) => void,
+  delay: number,
+) {
   let timeout: NodeJS.Timeout | null = null;
   return (...args: T) => {
     if (!timeout) {
@@ -137,6 +140,7 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     return (
       <div className="w-full h-full">
         <Tldraw
+          licenseKey={process.env.TLDRAW_LICENSE_KEY}
           store={store}
           onMount={handleMount}
           components={{
