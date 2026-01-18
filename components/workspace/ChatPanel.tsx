@@ -52,16 +52,29 @@ export function ChatPanel() {
   }, [messages]);
 
   useEffect(() => {
+    console.log("🔄 Processing messages, total count:", messages.length);
+    console.log("🔄 Already processed:", processedMessageIdsRef.current.size);
+
     messages.forEach((message) => {
       // Skip if already processed this message
       if (processedMessageIdsRef.current.has(message.id)) {
+        console.log("⏭️ Skipping already processed message:", message.id);
         return;
       }
 
       if (message.role === "assistant" && message.parts) {
-        console.log("Assistant message parts:", message.parts);
-        message.parts.forEach((part) => {
-          console.log("Part type:", part.type, "Part:", part);
+        console.log("🤖 Processing assistant message:", message.id);
+        console.log("📦 Parts count:", message.parts.length);
+        console.log("📦 Parts:", JSON.stringify(message.parts, null, 2));
+
+        let foundToolCall = false;
+        message.parts.forEach((part, index) => {
+          console.log(`📋 Part ${index}:`, {
+            type: part.type,
+            hasToolName: "toolName" in part,
+            toolName: "toolName" in part ? part.toolName : undefined,
+            hasArgs: "args" in part,
+          });
 
           // AI SDK useChat hook returns tool calls with part.type === 'tool-call'
           // and a toolName property
@@ -73,6 +86,10 @@ export function ChatPanel() {
             part.args &&
             typeof part.args === "object"
           ) {
+            foundToolCall = true;
+            console.log("🎯 Found proposeAnnotation tool call!");
+            console.log("🎯 Args:", part.args);
+
             const { type, text, positionHint } = part.args as {
               type: "question" | "hint";
               text: string;
@@ -94,8 +111,13 @@ export function ChatPanel() {
           }
         });
 
+        if (!foundToolCall) {
+          console.log("⚠️ No tool calls found in this assistant message");
+        }
+
         // Mark message as processed
         processedMessageIdsRef.current.add(message.id);
+        console.log("✓ Marked message as processed:", message.id);
       }
     });
   }, [messages, addProposedAnnotation]);

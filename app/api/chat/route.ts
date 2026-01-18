@@ -99,6 +99,14 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
       isInitialGreeting,
       messageCount: modelMessages.length,
       hasScreenshot: !!screenshot,
+      hasProblem: !!(problem?.text || problem?.imageUrl),
+      systemPromptLength: systemMessage.length,
+    });
+
+    // Debug: Log if we have the tool available
+    console.log("🔧 Tool configuration:", {
+      toolsAvailable: ["proposeAnnotation"],
+      screenshotProvided: !!screenshot,
     });
 
     const result = isInitialGreeting
