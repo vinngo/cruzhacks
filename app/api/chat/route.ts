@@ -3,34 +3,46 @@ import {
   streamText,
   UIMessage,
   ModelMessage,
+  tool,
 } from "ai";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/ai/prompt";
 
-// Define annotation tool schema for AI to propose canvas annotations
-const proposeAnnotationSchema = z.object({
-  type: z
-    .enum(["question", "hint"])
-    .describe(
-      "Type of annotation: question for Socratic questions, hint for scaffolding/partial solutions",
-    ),
-  text: z
-    .string()
-    .describe(
-      "The annotation text. Keep concise (1-2 sentences max). Questions should be open-ended. Hints should be partial (not complete answers).",
-    ),
-  positionHint: z
-    .enum(["top-left", "top-right", "bottom-left", "bottom-right", "center"])
-    .optional()
-    .describe("Rough position preference. Algorithm will avoid overlaps."),
+// Define annotation tool for AI to propose canvas annotations
+const proposeAnnotationTool = tool({
+  description:
+    "Propose an annotation (question or hint) to appear on the student's canvas. Use this when you want to guide their thinking about a specific part of their work.",
+  inputSchema: z.object({
+    type: z
+      .enum(["question", "hint"])
+      .describe(
+        "Type of annotation: question for Socratic questions, hint for scaffolding/partial solutions",
+      ),
+    text: z
+      .string()
+      .describe(
+        "The annotation text. Keep concise (1-2 sentences max). Questions should be open-ended. Hints should be partial (not complete answers).",
+      ),
+    positionHint: z
+      .enum(["top-left", "top-right", "bottom-left", "bottom-right", "center"])
+      .optional()
+      .describe("Rough position preference. Algorithm will avoid overlaps."),
+  }),
+  execute: async ({ type, text, positionHint }) => {
+    // Tool execution is handled client-side by ChatPanel.tsx
+    // This just returns the input for the model's confirmation
+    console.log("🔧 proposeAnnotation tool called:", {
+      type,
+      text,
+      positionHint,
+    });
+    return { success: true, type, text, positionHint };
+  },
 });
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Request body keys:", Object.keys(body));
-    console.log("Screenshot present:", !!body.screenshot);
-    console.log("Screenshot length:", body.screenshot?.length);
 
     const {
       messages,
@@ -41,8 +53,6 @@ export async function POST(req: Request) {
       problem: { text: string | undefined; imageUrl: string | undefined };
       screenshot: string | undefined;
     } = body;
-
-    console.log("screenshot:", screenshot);
 
     if (!messages || !Array.isArray(messages)) {
       return Response.json(
@@ -85,13 +95,25 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
       } as ModelMessage);
     }
 
+    console.log("📤 Starting AI stream:", {
+      isInitialGreeting,
+      messageCount: modelMessages.length,
+      hasScreenshot: !!screenshot,
+    });
+
     const result = isInitialGreeting
       ? streamText({
           model: "anthropic/claude-haiku-4.5",
           system: systemMessage,
           prompt:
-            "Greet the student and ask ONE opening Socratic question to help them start thinking about this problem. Examples: 'What information does this problem give you?' or 'What do you think would be a good first step?' Keep it encouraging and open-ended.",
+            "Greet the student and ask ONE opening Socratic question to help them start thinking about this problem. Examples: 'What information does this problem give you?' or 'What do you think would be a good first step?' Keep it encouraging and open-ended. DO NOT ATTEMPT ANY TOOL CALLS.",
+          tools: {
+            proposeAnnotation: proposeAnnotationTool,
+          },
           temperature: 0.7,
+          onStepFinish: ({ toolCalls }) => {
+            console.log("🔧 Step finished, tool calls:", toolCalls);
+          },
           onError: ({ error }) => {
             console.error("AI streaming error:", error);
           },
@@ -100,7 +122,13 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           model: "anthropic/claude-haiku-4.5",
           system: systemMessage,
           messages: modelMessages,
+          tools: {
+            proposeAnnotation: proposeAnnotationTool,
+          },
           temperature: 0.7,
+          onStepFinish: ({ toolCalls }) => {
+            console.log("🔧 Step finished, tool calls:", toolCalls);
+          },
           onError: ({ error }) => {
             console.error("AI streaming error:", error);
           },
