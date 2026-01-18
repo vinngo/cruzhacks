@@ -66,7 +66,9 @@ export function ChatPanel() {
           // AI SDK useChat hook returns tool calls with part.type === 'tool-call'
           // and a toolName property
           if (
-            part.type === "tool-proposeAnnotation" &&
+            part.type === "tool-call" &&
+            "toolName" in part &&
+            part.toolName === "proposeAnnotation" &&
             "args" in part &&
             part.args &&
             typeof part.args === "object"
