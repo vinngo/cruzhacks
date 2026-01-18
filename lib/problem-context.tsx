@@ -1,5 +1,6 @@
 "use client";
 
+import { ProposedAnnotation } from "./types/annotations";
 import { useContext, createContext, useState } from "react";
 
 export type ProblemContextType = {
@@ -12,6 +13,10 @@ export type ProblemContextType = {
   initializeChat(): void;
   canvasScreenshot: string | null;
   setCanvasScreenshot(screenshot: string | null): void;
+  proposedAnnotations: ProposedAnnotation[];
+  addProposedAnnotation(annotation: ProposedAnnotation): void;
+  removeProposedAnnotation(id: string): void;
+  clearProposedAnnotations(): void;
 };
 
 export const ProblemContext = createContext<ProblemContextType | null>(null);
@@ -58,6 +63,30 @@ export const ProblemProvider = ({
     setCanvasScreenshotState(screenshot);
   };
 
+  const [proposedAnnotations, setProposedAnnotations] = useState<
+    ProposedAnnotation[]
+  >([]);
+
+  const addProposedAnnotation = (annotation: ProposedAnnotation) => {
+    console.log(
+      "📝 Adding annotation to context:",
+      annotation,
+      "Current count:",
+      proposedAnnotations.length,
+    );
+    setProposedAnnotations((prev) => [...prev, annotation]);
+  };
+
+  const removeProposedAnnotation = (id: string) => {
+    setProposedAnnotations((prev) =>
+      prev.filter((annotation) => annotation.id !== id),
+    );
+  };
+
+  const clearProposedAnnotations = () => {
+    setProposedAnnotations([]);
+  };
+
   return (
     <ProblemContext.Provider
       value={{
@@ -70,6 +99,10 @@ export const ProblemProvider = ({
         initializeChat,
         canvasScreenshot,
         setCanvasScreenshot,
+        proposedAnnotations,
+        addProposedAnnotation,
+        removeProposedAnnotation,
+        clearProposedAnnotations,
       }}
     >
       {children}

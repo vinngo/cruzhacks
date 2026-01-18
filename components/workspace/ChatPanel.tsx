@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useProblem } from "@/lib/problem-context";
+import { ProposedAnnotation } from "@/lib/types/annotations";
 import { Button } from "@/components/ui/button";
 import {
   SendHorizontalIcon,
@@ -24,16 +25,78 @@ export function ChatPanel() {
     chatInitialized,
     initializeChat,
     canvasScreenshot,
+    addProposedAnnotation,
   } = useProblem();
   const [input, setInput] = useState("");
   const greetingSentRef = useRef(false);
   const lastMessageTimeRef = useRef<number>(0);
+  const processedMessageIdsRef = useRef<Set<string>>(new Set());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { messages, status, sendMessage } = useChat();
 
   const isLoading = status === "submitted" || status === "streaming";
+
+  // Debug: Log all messages whenever they change
+  useEffect(() => {
+    console.log("=== ALL MESSAGES ===");
+    messages.forEach((msg, idx) => {
+      console.log(`Message ${idx}:`, {
+        id: msg.id,
+        role: msg.role,
+        parts: msg.parts,
+      });
+    });
+    console.log("===================");
+  }, [messages]);
+
+  useEffect(() => {
+    messages.forEach((message) => {
+      // Skip if already processed this message
+      if (processedMessageIdsRef.current.has(message.id)) {
+        return;
+      }
+
+      if (message.role === "assistant" && message.parts) {
+        console.log("Assistant message parts:", message.parts);
+        message.parts.forEach((part) => {
+          console.log("Part type:", part.type, "Part:", part);
+
+          // AI SDK useChat hook returns tool calls with part.type === 'tool-call'
+          // and a toolName property
+          if (
+            part.type === "tool-proposeAnnotation" &&
+            "args" in part &&
+            part.args &&
+            typeof part.args === "object"
+          ) {
+            const { type, text, positionHint } = part.args as {
+              type: "question" | "hint";
+              text: string;
+              positionHint?:
+                | "top-left"
+                | "top-right"
+                | "bottom-left"
+                | "bottom-right"
+                | "center";
+            };
+            const annotation: ProposedAnnotation = {
+              id: crypto.randomUUID(), // Unique ID for each annotation
+              type,
+              text,
+              positionHint,
+            };
+            addProposedAnnotation(annotation);
+            console.log("✅ Proposed annotation added:", annotation);
+          }
+        });
+
+        // Mark message as processed
+        processedMessageIdsRef.current.add(message.id);
+      }
+    });
+  }, [messages, addProposedAnnotation]);
 
   // Send initial greeting when component mounts
   useEffect(() => {
@@ -42,7 +105,6 @@ export function ChatPanel() {
       !chatInitialized &&
       (problemText || problemImage?.url)
     ) {
-      console.log("Triggering initial greeting");
       greetingSentRef.current = true;
       initializeChat();
       // Send empty message to trigger AI greeting
@@ -72,10 +134,6 @@ export function ChatPanel() {
     // Only auto-analyze if user hasn't sent a message in the last 5 seconds
     // This avoids interrupting active typing
     if (timeSinceLastMessage > 5000 && !isLoading) {
-      console.log(
-        "Auto-analyzing canvas screenshot, length:",
-        canvasScreenshot.length,
-      );
       setIsAnalyzing(true);
       // Send a canvas update marker (gets replaced in API with proper text)
       sendMessage(
