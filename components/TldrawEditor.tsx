@@ -140,7 +140,7 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
     return (
       <div className="w-full h-full">
         <Tldraw
-          licenseKey={process.env.TLDRAW_LICENSE_KEY}
+          licenseKey={process.env.NEXT_PUBLIC_TLDRAW_LICENSE_KEY}
           store={store}
           onMount={handleMount}
           components={{
