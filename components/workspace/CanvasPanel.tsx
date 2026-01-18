@@ -49,7 +49,7 @@ export default function CanvasPanel() {
       } catch (error) {
         console.error("Failed to capture screenshot:", error);
       }
-    }, 4000); // 4 seconds
+    }, 3000); // 3 seconds
   }, [setCanvasScreenshot]);
 
   return (
