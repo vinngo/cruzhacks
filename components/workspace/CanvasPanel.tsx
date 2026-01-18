@@ -4,6 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useProblem } from "@/lib/problem-context";
 import { TldrawEditorRef } from "@/components/TldrawEditor";
+import { AnnotationOverlay } from "./AnnotationOverlay";
 
 const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
   ssr: false,
@@ -54,6 +55,7 @@ export default function CanvasPanel() {
   return (
     <div className="h-full relative">
       <TldrawEditor ref={editorRef} onChange={handleCanvasChange} />
+      <AnnotationOverlay editorRef={editorRef} />
     </div>
   );
 }
