@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useProblem } from "@/lib/problem-context";
 import { TldrawEditorRef } from "@/components/TldrawEditor";

@@ -95,7 +95,9 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
   }, [proposedAnnotations, editorRef]);
 
   // Calculate positions for all annotations using smart positioning
-  // useMemo dependency array excludes editorRef - relies on proposedAnnotations only
+  // Note: We access editorRef.current during render which React warns about.
+  // This is intentional - we need the editor instance for position calculation.
+  // The positions may be briefly stale but will update on next render.
   const calculatedPositions = useMemo(() => {
     const editor = editorRef.current?.getEditor() || null;
     const positions: AnnotationPosition[] = [];
@@ -106,6 +108,8 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
     });
 
     return positions;
+    // editorRef is intentionally omitted to avoid re-calculating on every ref change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [proposedAnnotations]);
 
   // Store calculated positions in context for approve reuse

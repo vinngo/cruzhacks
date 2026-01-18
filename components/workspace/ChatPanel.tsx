@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useProblem } from "@/lib/problem-context";
 import { ProposedAnnotation } from "@/lib/types/annotations";
@@ -37,7 +37,7 @@ export function ChatPanel() {
 
   // Debug: Add window function to clear cache if needed
   useEffect(() => {
-    (window as any).clearMessageCache = () => {
+    (window as Window & { clearMessageCache?: () => void }).clearMessageCache = () => {
       processedToolCallIdsRef.current.clear();
       setForceReprocess(prev => prev + 1);
       console.log("🧹 Message cache cleared! Reprocessing...");
@@ -123,10 +123,10 @@ export function ChatPanel() {
 
             if (toolArgs && typeof toolArgs === "object") {
               console.log("🎯 Tool args:", toolArgs);
-              // Access properties directly (they may be non-enumerable or getters)
-              const type = (toolArgs as any).type as "question" | "hint";
-              const text = (toolArgs as any).text as string;
-              const positionHint = (toolArgs as any).positionHint as "top-left" | "top-right" | "center" | undefined;
+              // Access properties directly
+              const type = toolArgs.type;
+              const text = toolArgs.text;
+              const positionHint = toolArgs.positionHint;
 
               console.log("🎯 Extracted values:", { type, text, positionHint });
 

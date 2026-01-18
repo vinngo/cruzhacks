@@ -3,7 +3,6 @@
 import {
   Tldraw,
   createTLStore,
-  loadSnapshot,
   getSnapshot,
   createShapeId,
   Editor,
@@ -22,9 +21,9 @@ import { createScreenshotPartUtil } from "@/lib/utils";
 const STORAGE_KEY = "socratic-whiteboard-canvas";
 
 // Custom throttle function to avoid external dependencies
-function throttle(fn: Function, delay: number) {
+function throttle<T extends unknown[]>(fn: (...args: T) => void, delay: number) {
   let timeout: NodeJS.Timeout | null = null;
-  return (...args: any[]) => {
+  return (...args: T) => {
     if (!timeout) {
       timeout = setTimeout(() => {
         fn(...args);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 
 interface ChatInputProps {
   value: string;
@@ -87,10 +88,15 @@ export default function ChatInput({
           <div className="border border-gray-300 rounded-2xl p-4 bg-white">
             <div className="flex items-start gap-4">
               <div className="flex-1">
-                <img
+                <Image
                   src={URL.createObjectURL(image)}
                   alt="Problem preview"
                   className="max-h-48 w-auto rounded-lg shadow-sm"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ width: 'auto', height: 'auto', maxHeight: '12rem' }}
+                  unoptimized
                 />
                 <p className="mt-2 text-sm text-gray-600">{image.name}</p>
               </div>

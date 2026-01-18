@@ -133,13 +133,15 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           tools: {
             proposeAnnotation: proposeAnnotationTool,
           },
-          maxSteps: 5, // Allow multi-step tool calling
           toolChoice: "auto", // Let AI decide when to use tools
           temperature: 0.7,
           onStepFinish: ({ toolCalls }) => {
             console.log("🔧 Step finished, tool calls:", toolCalls);
             if (toolCalls && toolCalls.length > 0) {
-              console.log("✨ Tool calls detected:", JSON.stringify(toolCalls, null, 2));
+              console.log(
+                "✨ Tool calls detected:",
+                JSON.stringify(toolCalls, null, 2),
+              );
             }
           },
           onError: ({ error }) => {
