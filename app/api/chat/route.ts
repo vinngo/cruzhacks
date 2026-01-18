@@ -119,6 +119,7 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
             proposeAnnotation: proposeAnnotationTool,
           },
           temperature: 0.7,
+          maxSteps: 5, // Allow tool calls in multi-step responses
           onStepFinish: ({ toolCalls }) => {
             console.log("🔧 Step finished, tool calls:", toolCalls);
           },
@@ -134,8 +135,12 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
             proposeAnnotation: proposeAnnotationTool,
           },
           temperature: 0.7,
+          maxSteps: 5, // Allow multiple tool calls per response
           onStepFinish: ({ toolCalls }) => {
             console.log("🔧 Step finished, tool calls:", toolCalls);
+            if (toolCalls && toolCalls.length > 0) {
+              console.log("✨ Tool calls detected:", JSON.stringify(toolCalls, null, 2));
+            }
           },
           onError: ({ error }) => {
             console.error("AI streaming error:", error);
