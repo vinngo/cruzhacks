@@ -85,6 +85,15 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
     setAnnotationPosition,
   } = useProblem();
 
+  // Debug: Log when proposed annotations change
+  useEffect(() => {
+    console.log("📍 AnnotationOverlay render:", {
+      annotationCount: proposedAnnotations.length,
+      annotations: proposedAnnotations,
+      hasEditorRef: !!editorRef.current,
+    });
+  }, [proposedAnnotations, editorRef]);
+
   // Calculate positions for all annotations using smart positioning
   // useMemo dependency array excludes editorRef - relies on proposedAnnotations only
   const calculatedPositions = useMemo(() => {
@@ -147,19 +156,32 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
 
   return (
     <>
-      {proposedAnnotations.map((annotation, index) => {
-        const position =
-          annotationPositions.get(annotation.id) || calculatedPositions[index];
-        return (
-          <AnnotationCard
-            key={annotation.id}
-            annotation={annotation}
-            onApprove={() => handleApprove(annotation)}
-            onDismiss={() => handleDismiss(annotation.id)}
-            position={position}
-          />
-        );
-      })}
+      {proposedAnnotations.length > 0 ? (
+        proposedAnnotations.map((annotation, index) => {
+          const position =
+            annotationPositions.get(annotation.id) ||
+            calculatedPositions[index];
+          console.log("🎯 Rendering annotation card:", {
+            id: annotation.id,
+            text: annotation.text,
+            position,
+          });
+          return (
+            <AnnotationCard
+              key={annotation.id}
+              annotation={annotation}
+              onApprove={() => handleApprove(annotation)}
+              onDismiss={() => handleDismiss(annotation.id)}
+              position={position}
+            />
+          );
+        })
+      ) : (
+        <div className="hidden">
+          {/* No annotations to display - this div helps with debugging */}
+          {console.log("📍 No annotations to render")}
+        </div>
+      )}
     </>
   );
 }
