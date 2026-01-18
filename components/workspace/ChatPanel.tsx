@@ -33,6 +33,16 @@ export function ChatPanel() {
   const processedMessageIdsRef = useRef<Set<string>>(new Set());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [forceReprocess, setForceReprocess] = useState(0);
+
+  // Debug: Add window function to clear cache if needed
+  useEffect(() => {
+    (window as any).clearMessageCache = () => {
+      processedMessageIdsRef.current.clear();
+      setForceReprocess(prev => prev + 1);
+      console.log("🧹 Message cache cleared! Reprocessing...");
+    };
+  }, []);
 
   const { messages, status, sendMessage } = useChat();
 
@@ -74,23 +84,25 @@ export function ChatPanel() {
             hasToolName: "toolName" in part,
             toolName: "toolName" in part ? part.toolName : undefined,
             hasArgs: "args" in part,
+            hasInput: "input" in part,
+            fullPart: part,
           });
 
-          // AI SDK useChat hook returns tool calls with part.type === 'tool-call'
-          // and a toolName property
-          if (
-            part.type === "tool-call" &&
-            "toolName" in part &&
-            part.toolName === "proposeAnnotation" &&
-            "args" in part &&
-            part.args &&
-            typeof part.args === "object"
-          ) {
+          // AI SDK can return tool calls in different formats:
+          // Format 1: part.type === "tool-call" with toolName property
+          // Format 2: part.type === "tool-{toolName}" with input property
+          const isToolCall =
+            (part.type === "tool-call" &&
+              "toolName" in part &&
+              part.toolName === "proposeAnnotation") ||
+            part.type === "tool-proposeAnnotation";
+
+          if (isToolCall) {
             foundToolCall = true;
             console.log("🎯 Found proposeAnnotation tool call!");
-            console.log("🎯 Args:", part.args);
 
-            const { type, text, positionHint } = part.args as {
+            // Extract args from either 'args' or 'input' property
+            const toolArgs = ("args" in part ? part.args : "input" in part ? part.input : null) as {
               type: "question" | "hint";
               text: string;
               positionHint?:
@@ -99,15 +111,22 @@ export function ChatPanel() {
                 | "bottom-left"
                 | "bottom-right"
                 | "center";
-            };
-            const annotation: ProposedAnnotation = {
-              id: crypto.randomUUID(), // Unique ID for each annotation
-              type,
-              text,
-              positionHint,
-            };
-            addProposedAnnotation(annotation);
-            console.log("✅ Proposed annotation added:", annotation);
+            } | null;
+
+            if (toolArgs && typeof toolArgs === "object") {
+              console.log("🎯 Tool args:", toolArgs);
+              const { type, text, positionHint } = toolArgs;
+              const annotation: ProposedAnnotation = {
+                id: crypto.randomUUID(), // Unique ID for each annotation
+                type,
+                text,
+                positionHint,
+              };
+              addProposedAnnotation(annotation);
+              console.log("✅ Proposed annotation added:", annotation);
+            } else {
+              console.warn("⚠️ Tool call found but args/input missing or invalid");
+            }
           }
         });
 
@@ -120,7 +139,7 @@ export function ChatPanel() {
         console.log("✓ Marked message as processed:", message.id);
       }
     });
-  }, [messages, addProposedAnnotation]);
+  }, [messages, addProposedAnnotation, forceReprocess]);
 
   // Send initial greeting when component mounts
   useEffect(() => {

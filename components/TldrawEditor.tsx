@@ -7,6 +7,7 @@ import {
   getSnapshot,
   createShapeId,
   Editor,
+  toRichText,
 } from "tldraw";
 import "tldraw/tldraw.css";
 import {
@@ -118,12 +119,14 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
           x: pagePosition.x,
           y: pagePosition.y,
           props: {
-            text,
+            richText: toRichText(text),
             color, // 'blue' for questions, 'yellow' for hints (tldraw colors)
             size: "m",
             font: "sans",
             textAlign: "start",
             w: 250, // Width of text box
+            autoSize: false,
+            scale: 1,
           },
         });
 

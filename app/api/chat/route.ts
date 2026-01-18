@@ -127,12 +127,13 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           },
         })
       : streamText({
-          model: "anthropic/claude-haiku-4.5",
+          model: "anthropic/claude-sonnet-4",
           system: systemMessage,
           messages: modelMessages,
           tools: {
             proposeAnnotation: proposeAnnotationTool,
           },
+          maxSteps: 5, // Allow multi-step tool calling
           toolChoice: "auto", // Let AI decide when to use tools
           temperature: 0.7,
           onStepFinish: ({ toolCalls }) => {
