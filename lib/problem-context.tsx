@@ -1,6 +1,7 @@
 "use client";
 
 import { ProposedAnnotation } from "./types/annotations";
+import { AnnotationPosition } from "./annotation-positioning";
 import { useContext, createContext, useState } from "react";
 
 export type ProblemContextType = {
@@ -14,9 +15,11 @@ export type ProblemContextType = {
   canvasScreenshot: string | null;
   setCanvasScreenshot(screenshot: string | null): void;
   proposedAnnotations: ProposedAnnotation[];
+  annotationPositions: Map<string, AnnotationPosition>;
   addProposedAnnotation(annotation: ProposedAnnotation): void;
   removeProposedAnnotation(id: string): void;
   clearProposedAnnotations(): void;
+  setAnnotationPosition(id: string, position: AnnotationPosition): void;
 };
 
 export const ProblemContext = createContext<ProblemContextType | null>(null);
@@ -67,6 +70,10 @@ export const ProblemProvider = ({
     ProposedAnnotation[]
   >([]);
 
+  const [annotationPositions, setAnnotationPositions] = useState<
+    Map<string, AnnotationPosition>
+  >(new Map());
+
   const addProposedAnnotation = (annotation: ProposedAnnotation) => {
     console.log(
       "📝 Adding annotation to context:",
@@ -81,10 +88,20 @@ export const ProblemProvider = ({
     setProposedAnnotations((prev) =>
       prev.filter((annotation) => annotation.id !== id),
     );
+    setAnnotationPositions((prev) => {
+      const updated = new Map(prev);
+      updated.delete(id);
+      return updated;
+    });
   };
 
   const clearProposedAnnotations = () => {
     setProposedAnnotations([]);
+    setAnnotationPositions(new Map());
+  };
+
+  const setAnnotationPosition = (id: string, position: AnnotationPosition) => {
+    setAnnotationPositions((prev) => new Map(prev).set(id, position));
   };
 
   return (
@@ -100,9 +117,11 @@ export const ProblemProvider = ({
         canvasScreenshot,
         setCanvasScreenshot,
         proposedAnnotations,
+        annotationPositions,
         addProposedAnnotation,
         removeProposedAnnotation,
         clearProposedAnnotations,
+        setAnnotationPosition,
       }}
     >
       {children}

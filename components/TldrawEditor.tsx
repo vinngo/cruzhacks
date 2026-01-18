@@ -35,6 +35,12 @@ function throttle(fn: Function, delay: number) {
 
 export interface TldrawEditorRef {
   captureScreenshot: () => Promise<string[] | null>;
+  getEditor: () => Editor | null;
+  addAnnotationToCanvas: (
+    text: string,
+    screenPosition: { x: number; y: number },
+    color: string,
+  ) => void;
 }
 
 export interface CustomTldrawEditorProps {
@@ -88,6 +94,41 @@ const TldrawEditor = forwardRef<TldrawEditorRef, CustomTldrawEditorProps>(
           console.error("Failed to capture screenshot:", error);
           return null;
         }
+      },
+      getEditor: () => editorRef.current,
+      addAnnotationToCanvas: (
+        text: string,
+        screenPosition: { x: number; y: number },
+        color: string,
+      ) => {
+        if (!editorRef.current) {
+          console.warn("Editor not mounted yet");
+          return;
+        }
+
+        // CRITICAL: Convert screen coordinates to page coordinates
+        // calculateAnnotationPosition returns screen pixels, but createShape expects page coordinates
+        const pagePosition = editorRef.current.screenToPage(screenPosition);
+
+        const shapeId = createShapeId();
+
+        editorRef.current.createShape({
+          id: shapeId,
+          type: "text",
+          x: pagePosition.x,
+          y: pagePosition.y,
+          props: {
+            text,
+            color, // 'blue' for questions, 'yellow' for hints (tldraw colors)
+            size: "m",
+            font: "sans",
+            textAlign: "start",
+            w: 250, // Width of text box
+          },
+        });
+
+        // Optional: Select the new shape to draw attention
+        editorRef.current.select(shapeId);
       },
     }));
 

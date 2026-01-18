@@ -9,12 +9,12 @@ import {
   AnnotationPosition,
 } from "@/lib/annotation-positioning";
 import { TldrawEditorRef } from "@/components/TldrawEditor";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 interface AnnotationCardProps {
   annotation: ProposedAnnotation;
-  onApprove: (id: string) => void;
-  onDismiss: (id: string) => void;
+  onApprove: () => void;
+  onDismiss: () => void;
   position: AnnotationPosition;
 }
 
@@ -55,14 +55,14 @@ function AnnotationCard({
 
       <div className="flex gap-2">
         <button
-          onClick={() => onApprove(annotation.id)}
+          onClick={onApprove}
           className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors"
         >
           <CheckIcon className="w-4 h-4" />
           Approve
         </button>
         <button
-          onClick={() => onDismiss(annotation.id)}
+          onClick={onDismiss}
           className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors"
         >
           <XIcon className="w-4 h-4" />
@@ -78,22 +78,16 @@ interface AnnotationOverlayProps {
 }
 
 export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
-  const { proposedAnnotations, removeProposedAnnotation } = useProblem();
-
-  const handleApprove = (id: string) => {
-    // Will be implemented in next plan (canvas integration)
-    console.log("Approve annotation:", id);
-    // For now, just remove from proposed list
-    removeProposedAnnotation(id);
-  };
-
-  const handleDismiss = (id: string) => {
-    removeProposedAnnotation(id);
-  };
+  const {
+    proposedAnnotations,
+    removeProposedAnnotation,
+    annotationPositions,
+    setAnnotationPosition,
+  } = useProblem();
 
   // Calculate positions for all annotations using smart positioning
   // useMemo dependency array excludes editorRef - relies on proposedAnnotations only
-  const annotationPositions = useMemo(() => {
+  const calculatedPositions = useMemo(() => {
     const editor = editorRef.current?.getEditor() || null;
     const positions: AnnotationPosition[] = [];
 
@@ -105,17 +99,67 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
     return positions;
   }, [proposedAnnotations]);
 
+  // Store calculated positions in context for approve reuse
+  useEffect(() => {
+    proposedAnnotations.forEach((annotation, index) => {
+      if (!annotationPositions.has(annotation.id)) {
+        setAnnotationPosition(annotation.id, calculatedPositions[index]);
+      }
+    });
+  }, [
+    proposedAnnotations,
+    calculatedPositions,
+    annotationPositions,
+    setAnnotationPosition,
+  ]);
+
+  const handleApprove = (annotation: ProposedAnnotation) => {
+    if (!editorRef.current) {
+      console.warn("Editor ref not available");
+      return;
+    }
+
+    // Retrieve stored screen position (avoid recalculation drift)
+    const storedPosition = annotationPositions.get(annotation.id);
+    if (!storedPosition) {
+      console.warn("No stored position for annotation:", annotation.id);
+      return;
+    }
+
+    // Convert annotation type to tldraw color
+    const color = annotation.type === "question" ? "blue" : "yellow";
+
+    // Add to canvas as text shape (addAnnotationToCanvas handles screen-to-page conversion)
+    editorRef.current.addAnnotationToCanvas(
+      annotation.text,
+      storedPosition,
+      color,
+    );
+
+    // Remove from proposed annotations (also removes from annotationPositions map)
+    removeProposedAnnotation(annotation.id);
+  };
+
+  const handleDismiss = (id: string) => {
+    // Simply remove from state - no trace left
+    removeProposedAnnotation(id);
+  };
+
   return (
     <>
-      {proposedAnnotations.map((annotation, index) => (
-        <AnnotationCard
-          key={annotation.id}
-          annotation={annotation}
-          onApprove={handleApprove}
-          onDismiss={handleDismiss}
-          position={annotationPositions[index]}
-        />
-      ))}
+      {proposedAnnotations.map((annotation, index) => {
+        const position =
+          annotationPositions.get(annotation.id) || calculatedPositions[index];
+        return (
+          <AnnotationCard
+            key={annotation.id}
+            annotation={annotation}
+            onApprove={() => handleApprove(annotation)}
+            onDismiss={() => handleDismiss(annotation.id)}
+            position={position}
+          />
+        );
+      })}
     </>
   );
 }
