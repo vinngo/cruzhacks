@@ -9,25 +9,26 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 2 of 3 (Problem Input & AI Integration)
-Plan: 1 of 3 complete
+Phase: 3 of 3 (Guidance Annotations)
+Plan: 2 of 3 complete
 Status: Phase in progress
-Last activity: 2026-01-16 — Completed 02-01-PLAN.md (Problem input & state management)
+Last activity: 2026-01-18 — Completed 03-02-PLAN.md (Annotation overlay with smart positioning)
 
-Progress: █░░░░░░░░░ 33% (Phase 2)
+Progress: █████████░ 90% (9/10 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: N/A (manual implementation)
+- Total plans completed: 9
+- Average duration: ~7.5 min (automated plans only)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-canvas | 4/4 (complete) | 39.5 min | 9.9 min |
-| 02-problem-input---ai-integration | 1/3 (in progress) | Manual | Manual |
+| 02-problem-input---ai-integration | 3/3 (complete) | Manual | Manual |
+| 03-guidance-annotations | 2/3 (in progress) | ~18 min | ~9 min |
 
 ## Accumulated Context
 
@@ -53,6 +54,11 @@ Progress: █░░░░░░░░░ 33% (Phase 2)
 | React Context over Redux/Zustand | 02-01 | Simpler state management appropriate for 3-phase project scope |
 | Next.js Image with object URLs | 02-01 | Works without configuration; no optimization needed for client blobs |
 | Text OR image (mutually exclusive) | 02-01 | Clearer UX than allowing both simultaneously |
+| useMemo excludes editorRef from dependencies | 03-02 | Prevents unnecessary recalculations when editor mounts |
+| processedMessageIds Set for duplicate prevention | 03-02 | Prevents duplicate annotations on re-renders |
+| setState callback pattern in annotation state | 03-02 | Avoids stale closure bugs in add/remove operations |
+| MVP viewport-based positioning | 03-02 | Simpler than shape overlap detection, sufficient for phase 3 |
+| Blue theme for questions, amber for hints | 03-02 | Distinct visual identity helps students recognize annotation type |
 
 ### Pending Todos
 
@@ -64,7 +70,7 @@ Progress: █░░░░░░░░░ 33% (Phase 2)
 
 ## Session Continuity
 
-Last session: 2026-01-16
-Stopped at: Completed 02-01-PLAN.md (manual implementation)
+Last session: 2026-01-18
+Stopped at: Completed 03-02-PLAN.md (Annotation overlay with smart positioning)
 Resume file: None
-Next up: Plan 02-02 - AI SDK integration and Socratic chat API
+Next up: Plan 03-03 - Canvas integration (approve creates shapes)
