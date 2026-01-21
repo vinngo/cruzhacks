@@ -9,14 +9,17 @@ import {
   AnnotationPosition,
 } from "@/lib/annotation-positioning";
 import { TldrawEditorRef } from "@/components/TldrawEditor";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { Button } from "../ui/button";
+import { motion } from "motion/react";
+import { HoverCaption } from "../ui/fabula/hovercaption";
 
 interface AnnotationCardProps {
   annotation: ProposedAnnotation;
   onApprove: () => void;
   onDismiss: () => void;
   position: AnnotationPosition;
+  constraintsRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function AnnotationCard({
@@ -24,13 +27,22 @@ export default function AnnotationCard({
   onApprove,
   onDismiss,
   position,
+  constraintsRef,
 }: AnnotationCardProps) {
   const isQuestion = annotation.type === "question";
 
   return (
-    <div
+    <motion.div
+      drag
+      dragMomentum={false}
+      dragConstraints={constraintsRef}
+      dragElastic={0}
+      whileDrag={{
+        scale: 1.05,
+        boxShadow: "0px 10px 20px rgba(0,0,0,0.2)",
+      }}
       className={cn(
-        "absolute z-10 w-70 p-4 rounded-lg shadow-lg border-2 border-dashed backdrop-blur-sm",
+        "absolute z-10 w-70 p-4 rounded-lg shadow-lg border-2 border-dashed backdrop-blur-sm pointer-events-auto",
         isQuestion
           ? "bg-background border-blue-400"
           : "bg-background border-amber-400",
@@ -55,16 +67,17 @@ export default function AnnotationCard({
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={onApprove} variant={"outline"}>
-          <CheckIcon className="w-4 h-4" />
-          Approve
-        </Button>
-        <Button onClick={onDismiss}>
+        <Button
+          onClick={onDismiss}
+          variant="ghost"
+          size="sm"
+          className="text-xs"
+        >
           <XIcon className="w-4 h-4" />
           Dismiss
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -73,6 +86,7 @@ interface AnnotationOverlayProps {
 }
 
 export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
+  const constraintsRef = useRef<HTMLDivElement>(null);
   const {
     proposedAnnotations,
     removeProposedAnnotation,
@@ -177,7 +191,10 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
   }
 
   return (
-    <>
+    <div
+      ref={constraintsRef}
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+    >
       {proposedAnnotations.map((annotation, index) => {
         const position =
           annotationPositions.get(annotation.id) || calculatedPositions[index];
@@ -193,9 +210,10 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
             onApprove={() => handleApprove(annotation)}
             onDismiss={() => handleDismiss(annotation.id)}
             position={position}
+            constraintsRef={constraintsRef}
           />
         );
       })}
-    </>
+    </div>
   );
 }

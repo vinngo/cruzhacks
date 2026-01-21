@@ -318,7 +318,7 @@ export function ChatPanel() {
               transition={{ duration: 0.2 }}
               className="text-lg font-semibold text-gray-900"
             >
-              Elenchus - inquire
+              Elenchus
             </motion.h2>
           )}
         </AnimatePresence>
