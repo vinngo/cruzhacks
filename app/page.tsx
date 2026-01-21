@@ -1,33 +1,62 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import ChatInput from "@/components/landing/ChatInput";
 import { useProblem } from "@/lib/problem-context";
-import { cn } from "@/lib/utils";
+import {
+  PromptInput,
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
+  PromptInputAttachment,
+  PromptInputAttachments,
+  PromptInputBody,
+  PromptInputButton,
+  PromptInputFooter,
+  type PromptInputMessage,
+  PromptInputProvider,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputTools,
+} from "@/components/ai-elements/prompt-input";
 
 export default function Home() {
-  const [problemText, setProblemText] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
   const router = useRouter();
   const { setProblem, setProblemImage } = useProblem();
 
-  const handleSubmit = () => {
-    if (problemText.trim() || image) {
-      // Navigate to workspace
-      if (problemText.trim()) {
-        setProblem(problemText);
-      }
-      if (image) {
-        setProblemImage(image);
-      }
-      setSubmitted(true);
-      setTimeout(() => {
-        router.push("/workspace");
-      }, 800);
+  const handleSubmit = (message: PromptInputMessage) => {
+    const hasText = Boolean(message.text);
+    const hasAttachments = Boolean(message.files?.length);
+
+    if (!(hasText || hasAttachments)) {
+      return;
     }
+
+    // Set problem data
+    if (message.text.trim()) {
+      setProblem(message.text);
+    }
+    if (message.files && message.files.length > 0) {
+      // Convert the first file attachment to File object
+      const fileUrl = message.files[0];
+      if (fileUrl && fileUrl.url) {
+        fetch(fileUrl.url)
+          .then((res) => res.blob())
+          .then((blob) => {
+            const file = new File([blob], fileUrl.filename || "image.png", {
+              type: fileUrl.mediaType || "image/png",
+            });
+            setProblemImage(file);
+          })
+          .catch(() => {
+            // Handle error silently
+          });
+      }
+    }
+
+    // Navigate immediately to workspace
+    router.push("/workspace");
   };
 
   return (
@@ -41,50 +70,45 @@ export default function Home() {
         {/* Heading */}
         <div className="text-center space-y-4">
           <motion.h1
-            animate={{
-              x: submitted ? -630 : 0,
-              y: submitted ? -200 : 0,
-              transition: { duration: 0.5, ease: "easeInOut" },
-            }}
-            className={cn(
-              "font-semibold text-gray-900 tracking-tight",
-              submitted ? "text-4xl" : "text-6xl",
-            )}
+            layoutId="socratical-header"
+            className="font-semibold text-gray-900 tracking-tight text-6xl"
           >
             Socratical
           </motion.h1>
-          <motion.p
-            animate={{ opacity: submitted ? 0 : 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-xl text-gray-600 max-w-2xl"
-          >
+          <p className="text-xl text-gray-600 max-w-2xl">
             An intelligent whiteboard for visual problem solving.
-          </motion.p>
+          </p>
         </div>
 
         {/* Chat Input */}
-        <motion.div
-          animate={{ opacity: submitted ? 0 : 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full"
-        >
-          <ChatInput
-            value={problemText}
-            onChange={setProblemText}
-            onSubmit={handleSubmit}
-            image={image}
-            onImageSelect={setImage}
-          />
-        </motion.div>
+        <div className="w-full">
+          <PromptInputProvider>
+            <PromptInput globalDrop multiple onSubmit={handleSubmit}>
+              <PromptInputAttachments>
+                {(attachment) => <PromptInputAttachment data={attachment} />}
+              </PromptInputAttachments>
+              <PromptInputBody>
+                <PromptInputTextarea placeholder="Enter your problem or question..." />
+              </PromptInputBody>
+              <PromptInputFooter>
+                <PromptInputTools>
+                  <PromptInputActionMenu>
+                    <PromptInputActionMenuTrigger />
+                    <PromptInputActionMenuContent>
+                      <PromptInputActionAddAttachments />
+                    </PromptInputActionMenuContent>
+                  </PromptInputActionMenu>
+                </PromptInputTools>
+                <PromptInputSubmit />
+              </PromptInputFooter>
+            </PromptInput>
+          </PromptInputProvider>
+        </div>
 
         {/* Subtle hint */}
-        <motion.p
-          animate={{ opacity: submitted ? 0 : 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-sm text-gray-400 text-center"
-        >
+        <p className="text-sm text-gray-400 text-center">
           Work on a digital canvas while AI asks guiding questions
-        </motion.p>
+        </p>
       </motion.div>
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import ProblemPanel from "@/components/workspace/ProblemPanel";
 import CanvasPanel from "@/components/workspace/CanvasPanel";
 import { ChatPanel } from "@/components/workspace/ChatPanel";
 import { useProblem } from "@/lib/problem-context";
@@ -25,11 +24,6 @@ export default function WorkspacePage() {
 
       {/* Bottom: Panels (fills remaining space) */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: Problem Panel (fixed 20% width) */}
-        <div className="w-1/5 h-full">
-          <ProblemPanel />
-        </div>
-
         {/* Center: Canvas Panel (flexible, expands when chat collapses) */}
         <div className="flex-1 h-full">
           <CanvasPanel />

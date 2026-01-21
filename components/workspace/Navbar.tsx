@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useProblem } from "@/lib/problem-context";
 import { RotateCcw } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
   const router = useRouter();
@@ -21,9 +22,12 @@ export default function Navbar() {
 
   return (
     <div className="flex items-center justify-between border-b px-3 py-3">
-      <h1 className="text-4xl font-semibold text-gray-900 tracking-tight">
+      <motion.h1
+        layoutId="socratical-header"
+        className="text-4xl font-semibold text-gray-900 tracking-tight"
+      >
         Socratical
-      </h1>
+      </motion.h1>
 
       <button
         onClick={handleRestart}
