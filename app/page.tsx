@@ -76,7 +76,7 @@ export default function Home() {
             Socratical
           </motion.h1>
           <p className="text-xl text-gray-600 max-w-2xl">
-            An intelligent whiteboard for visual problem solving.
+            Philosophize your toughest subjects
           </p>
         </div>
 

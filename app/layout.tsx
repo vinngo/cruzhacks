@@ -3,8 +3,8 @@ import "./globals.css";
 import { ProblemProvider } from "@/lib/problem-context";
 
 export const metadata: Metadata = {
-  title: "Socratic Whiteboard",
-  description: "AI-powered math tutoring workspace",
+  title: "Socratical",
+  description: "Philosophize your toughest subjects",
 };
 
 export default function RootLayout({

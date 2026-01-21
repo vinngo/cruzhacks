@@ -10,6 +10,7 @@ import {
 } from "@/lib/annotation-positioning";
 import { TldrawEditorRef } from "@/components/TldrawEditor";
 import { useMemo, useEffect } from "react";
+import { Button } from "../ui/button";
 
 interface AnnotationCardProps {
   annotation: ProposedAnnotation;
@@ -18,7 +19,7 @@ interface AnnotationCardProps {
   position: AnnotationPosition;
 }
 
-function AnnotationCard({
+export default function AnnotationCard({
   annotation,
   onApprove,
   onDismiss,
@@ -29,10 +30,10 @@ function AnnotationCard({
   return (
     <div
       className={cn(
-        "absolute z-10 w-70 p-4 rounded-lg shadow-lg border-2 backdrop-blur-sm",
+        "absolute z-10 w-70 p-4 rounded-lg shadow-lg border-2 border-dashed backdrop-blur-sm",
         isQuestion
-          ? "bg-blue-50/95 border-blue-400"
-          : "bg-amber-50/95 border-amber-400",
+          ? "bg-background border-blue-400"
+          : "bg-background border-amber-400",
       )}
       style={{
         left: `${position.x}px`,
@@ -42,32 +43,26 @@ function AnnotationCard({
       <div className="mb-3">
         <span
           className={cn(
-            "text-xs font-semibold uppercase tracking-wide",
+            "text-xs uppercase tracking-wide font-serif",
             isQuestion ? "text-blue-700" : "text-amber-700",
           )}
         >
           {isQuestion ? "Question" : "Hint"}
         </span>
-        <p className="mt-1 text-sm text-gray-800 leading-relaxed">
+        <p className="mt-1 text-xs text-gray-800 leading-relaxed">
           {annotation.text}
         </p>
       </div>
 
       <div className="flex gap-2">
-        <button
-          onClick={onApprove}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors"
-        >
+        <Button onClick={onApprove} variant={"outline"}>
           <CheckIcon className="w-4 h-4" />
           Approve
-        </button>
-        <button
-          onClick={onDismiss}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors"
-        >
+        </Button>
+        <Button onClick={onDismiss}>
           <XIcon className="w-4 h-4" />
           Dismiss
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -103,7 +98,11 @@ export function AnnotationOverlay({ editorRef }: AnnotationOverlayProps) {
     const positions: AnnotationPosition[] = [];
 
     proposedAnnotations.forEach((annotation) => {
-      const position = calculateAnnotationPosition(editor, annotation, positions);
+      const position = calculateAnnotationPosition(
+        editor,
+        annotation,
+        positions,
+      );
       positions.push(position);
     });
 
