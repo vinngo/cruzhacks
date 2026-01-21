@@ -61,6 +61,25 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if DEBUG mode is enabled - disable AI responses
+    if (process.env.DEBUG === "true") {
+      console.log("🐛 DEBUG mode enabled - AI responses disabled");
+      return Response.json(
+        {
+          id: "debug-mode",
+          role: "assistant",
+          content:
+            "[DEBUG MODE] AI responses are disabled. Set DEBUG=false in .env.local to enable.",
+        },
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
+
     // Filter out empty messages (used for initial greeting trigger)
     const filteredMessages = messages.filter((msg) =>
       msg.parts.some((part) => part.type === "text" && part.text.trim()),
@@ -111,7 +130,10 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
 
     const result = isInitialGreeting
       ? streamText({
-          model: "anthropic/claude-haiku-4.5",
+          model:
+            process.env.DEV === "true"
+              ? "anthropic/claude-3-haiku"
+              : "anthropic/claude-haiku-4.5",
           system: systemMessage,
           prompt:
             "Greet the student and ask ONE opening Socratic question to help them start thinking about this problem. Examples: 'What information does this problem give you?' or 'What do you think would be a good first step?' Keep it encouraging and open-ended. DO NOT ATTEMPT ANY TOOL CALLS.",
@@ -127,7 +149,10 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           },
         })
       : streamText({
-          model: "anthropic/claude-sonnet-4",
+          model:
+            process.env.DEV === "true"
+              ? "anthropic/claude-3-haiku"
+              : "anthropic/claude-sonnet-4",
           system: systemMessage,
           messages: modelMessages,
           tools: {
