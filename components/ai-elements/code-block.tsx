@@ -52,8 +52,13 @@ const lineNumberTransformer: ShikiTransformer = {
 export async function highlightCode(
   code: string,
   language: BundledLanguage,
-  showLineNumbers = false
+  showLineNumbers = false,
 ) {
+  // Handle undefined or null code
+  if (!code || typeof code !== "string") {
+    return ["", ""];
+  }
+
   const transformers: ShikiTransformer[] = showLineNumbers
     ? [lineNumberTransformer]
     : [];
@@ -103,7 +108,7 @@ export const CodeBlock = ({
       <div
         className={cn(
           "group relative w-full overflow-hidden rounded-md border bg-background text-foreground",
-          className
+          className,
         )}
         {...props}
       >

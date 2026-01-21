@@ -5,7 +5,7 @@ import { AnnotationPosition } from "./annotation-positioning";
 import { useContext, createContext, useState } from "react";
 
 export type ProblemContextType = {
-  problemText: string | null;
+  problemText: string;
   problemImage: { url: string; file: File };
   setProblem(text: string): void;
   setProblemImage(file: File): void;
@@ -29,7 +29,7 @@ export const ProblemProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [problemText, setProblemText] = useState<string | null>(null);
+  const [problemText, setProblemText] = useState<string>("");
   const [problemImage, setProblemImageState] = useState<{
     url: string;
     file: File;
@@ -45,7 +45,7 @@ export const ProblemProvider = ({
   };
 
   const clearProblem = () => {
-    setProblemText(null);
+    setProblemText("");
     if (problemImage) {
       URL.revokeObjectURL(problemImage.url);
     }
@@ -75,12 +75,6 @@ export const ProblemProvider = ({
   >(new Map());
 
   const addProposedAnnotation = (annotation: ProposedAnnotation) => {
-    console.log(
-      "📝 Adding annotation to context:",
-      annotation,
-      "Current count:",
-      proposedAnnotations.length,
-    );
     setProposedAnnotations((prev) => [...prev, annotation]);
   };
 
