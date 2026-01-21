@@ -152,7 +152,7 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
           model:
             process.env.DEV === "true"
               ? "anthropic/claude-3-haiku"
-              : "anthropic/claude-sonnet-4",
+              : "anthropic/claude-haiku-4.5",
           system: systemMessage,
           messages: modelMessages,
           tools: {
