@@ -1,3 +1,9 @@
+# Socratical
+
+## Philosophize your toughest subjects.
+
+### Winner of the Vercel Track at Cruzhacks 2026 
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
