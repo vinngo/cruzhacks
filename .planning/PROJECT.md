@@ -27,22 +27,33 @@ The AI guides through questions, not answers. Students learn by being nudged tow
 - [ ] Chat and canvas annotations share conversation context
 - [ ] Demo completes one full problem-solving flow with visible Socratic guidance
 
-### Out of Scope
+### Post-Hackathon Extension (In Progress)
 
-- Multi-subject support beyond math — keeps demo focused
-- User accounts/persistence — hackathon demo doesn't need it
-- Mobile optimization — desktop demo is sufficient
+- [ ] Migrate from simple LLM calls to Mastra agent framework
+- [ ] Implement stateful canvas storage for scalability
+- [ ] Add Mastra workflow for structured tutoring sessions
+- [ ] Enable session tracking and analytics
+- [ ] Add quality control checks for Socratic method adherence
+- [ ] Implement canvas history and evolution tracking
+
+### Out of Scope (Current)
+
+- Multi-subject support beyond math — focus on math tutoring first
+- User accounts/persistence — use session-based storage for now
+- Mobile optimization — desktop is primary target
 - Arrows/highlights on canvas — text and hints only for v1
 - Error correction annotations — Socratic questioning handles this via chat
 
 ## Context
 
-**Hackathon:** This weekend (48 hours or less)
+**Status:** Post-hackathon production extension
 
-**Target tracks:**
+**Original Hackathon (Completed):**
 - Education track: Socratic method, adaptive to any math level
 - UX subtrack: Canvas-first design, non-intrusive guidance, clean transitions
 - Vercel subtrack: AI SDK integration, streaming responses
+
+**Current Phase:** Production extension with Mastra framework integration
 
 **User flow:**
 1. Landing page with centered chat input (ChatGPT/Claude style)
@@ -58,9 +69,9 @@ The AI guides through questions, not answers. Students learn by being nudged tow
 
 ## Constraints
 
-- **Tech stack**: Next.js, TypeScript, Tailwind, Zustand, tldraw, Vercel AI SDK — non-negotiable
-- **Timeline**: ~48 hours — must ruthlessly prioritize demo flow
-- **Demo scope**: One complete problem solved with visible Socratic guidance wins
+- **Tech stack**: Next.js, TypeScript, Tailwind, tldraw, Mastra framework, Vercel AI SDK
+- **Architecture**: Mastra workflow + agent + stateful storage for scalability
+- **Focus**: Production-ready features with observability and extensibility
 
 ## Key Decisions
 
@@ -73,4 +84,4 @@ The AI guides through questions, not answers. Students learn by being nudged tow
 | Text + hints only (no arrows/corrections) | Reduces complexity, keeps annotation scope tight | — Pending |
 
 ---
-*Last updated: 2025-01-16 after initialization*
+*Last updated: 2026-02-12 — Post-hackathon extension phase*

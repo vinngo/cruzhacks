@@ -5,16 +5,15 @@
 See: .planning/PROJECT.md
 
 **Core value:** The AI guides through questions, not answers. Students learn by being nudged toward discovery, not told what to do.
-**Current focus:** Phase 1 — Foundation & Canvas
+**Current focus:** Phase 4 — Mastra Framework Migration (Production Extension)
 
 ## Current Position
 
-Phase: 3 of 3 (Guidance Annotations)
-Plan: 2 of 3 complete
-Status: Phase in progress
-Last activity: 2026-01-18 — Completed 03-02-PLAN.md (Annotation overlay with smart positioning)
+Phase: 4 (Post-Hackathon Extension)
+Status: Architecture planning complete, implementation starting
+Last activity: 2026-02-12 — Mastra migration architecture designed
 
-Progress: █████████░ 90% (9/10 plans complete)
+Progress: Hackathon demo complete (10/10 plans) | Extension phase starting
 
 ## Performance Metrics
 
@@ -59,6 +58,11 @@ Progress: █████████░ 90% (9/10 plans complete)
 | setState callback pattern in annotation state | 03-02 | Avoids stale closure bugs in add/remove operations |
 | MVP viewport-based positioning | 03-02 | Simpler than shape overlap detection, sufficient for phase 3 |
 | Blue theme for questions, amber for hints | 03-02 | Distinct visual identity helps students recognize annotation type |
+| **Mastra framework for production** | 04 | Workflow orchestration + agent autonomy + built-in observability for scalability |
+| **Stateful canvas storage** | 04 | Store screenshots once, reference by ID; reduces token usage ~75% vs sending every request |
+| **Workflow + Agent hybrid** | 04 | Workflow enforces structured tutoring process; agent handles conversational AI |
+| **LibSQL storage for sessions** | 04 | Persistent storage for canvas snapshots, metrics, and session tracking |
+| **Quality control workflow step** | 04 | Automatic validation that AI follows Socratic method (no direct answers) |
 
 ### Pending Todos
 
@@ -70,7 +74,14 @@ Progress: █████████░ 90% (9/10 plans complete)
 
 ## Session Continuity
 
-Last session: 2026-01-18
-Stopped at: Completed 03-02-PLAN.md (Annotation overlay with smart positioning)
-Resume file: None
-Next up: Plan 03-03 - Canvas integration (approve creates shapes)
+Last session: 2026-02-12
+Focus: Mastra framework migration architecture
+Status: Design complete, implementation guide created
+Next up: Implement Phase 4 migration tasks:
+  1. Create canvas storage layer (lib/canvas-storage.ts)
+  2. Create Mastra tools (proposeAnnotation, viewWhiteboard)
+  3. Create tutor workflow (mastra/workflows/tutor-workflow.ts)
+  4. Update tutor agent with tools
+  5. Create new API route (/api/mastra/tutor)
+  6. Update ChatPanel to use workflow endpoint
+  7. Test in Mastra Studio

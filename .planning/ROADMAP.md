@@ -80,14 +80,45 @@ Plans:
 
 ---
 
+### Phase 4: Mastra Framework Migration (Production Extension)
+
+**Goal:** Migrate from simple LLM calls to production-ready Mastra framework with workflow orchestration, stateful storage, and observability
+**Depends on:** Phase 3 (hackathon demo complete)
+**Type:** Architecture upgrade for scalability and extensibility
+
+**Success Criteria:**
+1. Canvas screenshots stored in persistent storage, not sent with every request
+2. Tutor workflow orchestrates structured 5-step tutoring process
+3. Quality control step validates Socratic method adherence
+4. Session metrics tracked (duration, annotations, completion status)
+5. All agent interactions visible in Mastra Studio
+6. Token usage reduced by ~75% through stateful canvas storage
+7. Existing UX maintained (no breaking changes for users)
+
+**Implementation Tasks:**
+
+- [ ] Create canvas storage layer with LibSQL
+- [ ] Create proposeAnnotation tool for Mastra
+- [ ] Create viewWhiteboard tool for Mastra
+- [ ] Update TutorAgent with tools and Memory
+- [ ] Create 5-step tutor workflow (initialize, analyze, generate, validate, track)
+- [ ] Register workflow in Mastra instance
+- [ ] Create new API route using workflow
+- [ ] Update ChatPanel to use workflow endpoint
+- [ ] Test in Mastra Studio and verify observability
+- [ ] Validate token usage reduction and performance improvements
+
+---
+
 ## Progress
 
 | Phase | Status | Completed |
 |-------|--------|-----------|
 | 1 - Foundation & Canvas | Complete | 2026-01-16 |
-| 2 - Problem Input & AI Integration | In progress | — |
-| 3 - Guidance & Annotations | Not started | — |
+| 2 - Problem Input & AI Integration | Complete | 2026-01-17 |
+| 3 - Guidance & Annotations | Complete | 2026-01-18 |
+| 4 - Mastra Framework Migration | In progress | — |
 
 ---
 
-*Roadmap for milestone: v1.0 (hackathon demo)*
+*Roadmap for milestone: v1.0 (hackathon demo - complete) | v2.0 (production extension - in progress)*
