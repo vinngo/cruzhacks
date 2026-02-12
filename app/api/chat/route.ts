@@ -4,7 +4,6 @@ import {
   UIMessage,
   ModelMessage,
   tool,
-  type FileUIPart,
 } from "ai";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/ai/prompt";
