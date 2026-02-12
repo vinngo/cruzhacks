@@ -4,9 +4,11 @@ import {
   UIMessage,
   ModelMessage,
   tool,
+  type FileUIPart,
 } from "ai";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/ai/prompt";
+import { type FileReference } from "@/lib/file-storage";
 
 // Define annotation tool for AI to propose canvas annotations
 const proposeAnnotationTool = tool({
@@ -48,10 +50,12 @@ export async function POST(req: Request) {
       messages,
       problem,
       screenshot,
+      fileReferences,
     }: {
       messages: UIMessage[];
       problem: { text: string | undefined; imageUrl: string | undefined };
       screenshot: string | undefined;
+      fileReferences?: FileReference[];
     } = body;
 
     if (!messages || !Array.isArray(messages)) {
@@ -95,6 +99,7 @@ export async function POST(req: Request) {
 ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**Canvas State:** The student's current work is shown in the canvas screenshot attached to the conversation." : ""}`;
 
     // Convert filtered messages to model messages
+    // The AI SDK's convertToModelMessages handles experimental_attachments automatically
     const modelMessages = await convertToModelMessages(filteredMessages);
 
     // Add screenshot as an image message if available
@@ -113,20 +118,6 @@ ${problem?.text || "Image uploaded (description pending)"}${screenshot ? "\n\n**
         ],
       } as ModelMessage);
     }
-
-    console.log("📤 Starting AI stream:", {
-      isInitialGreeting,
-      messageCount: modelMessages.length,
-      hasScreenshot: !!screenshot,
-      hasProblem: !!(problem?.text || problem?.imageUrl),
-      systemPromptLength: systemMessage.length,
-    });
-
-    // Debug: Log if we have the tool available
-    console.log("🔧 Tool configuration:", {
-      toolsAvailable: ["proposeAnnotation"],
-      screenshotProvided: !!screenshot,
-    });
 
     const result = isInitialGreeting
       ? streamText({
