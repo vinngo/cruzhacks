@@ -60,12 +60,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen w-full flex items-center justify-center bg-white">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="flex flex-col items-center justify-center gap-8 px-8 max-w-3xl"
+        className="flex flex-col items-center justify-center gap-8 px-4 w-full max-w-150"
       >
         {/* Heading */}
         <div className="text-center space-y-4">
@@ -83,7 +83,7 @@ export default function Home() {
         {/* Chat Input */}
         <div className="w-full">
           <PromptInputProvider>
-            <PromptInput globalDrop multiple onSubmit={handleSubmit}>
+            <PromptInput globalDrop onSubmit={handleSubmit}>
               <PromptInputAttachments>
                 {(attachment) => <PromptInputAttachment data={attachment} />}
               </PromptInputAttachments>

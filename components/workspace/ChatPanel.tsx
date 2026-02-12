@@ -9,6 +9,9 @@ import {
   SendHorizontalIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ImageIcon,
+  Paperclip,
+  PaperclipIcon,
 } from "lucide-react";
 import {
   Conversation,
@@ -29,8 +32,23 @@ import {
   ToolInput,
   ToolOutput,
 } from "@/components/ai-elements/tool";
-import { UIMessage, type ToolUIPart } from "ai";
+import { UIMessage, type ToolUIPart, type FileUIPart } from "ai";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  PromptInput,
+  PromptInputBody,
+  PromptInputTextarea,
+  PromptInputHeader,
+  PromptInputFooter,
+  PromptInputTools,
+  PromptInputSubmit,
+  PromptInputAttachments,
+  PromptInputAttachment,
+  PromptInputButton,
+  type PromptInputMessage,
+  usePromptInputAttachments,
+} from "@/components/ai-elements/prompt-input";
+import { uploadFiles } from "@/lib/file-storage";
 
 type ProposeAnnotationInput = {
   type: "question" | "hint";
@@ -50,6 +68,21 @@ type ProposeAnnotationToolUIPart = ToolUIPart<{
   };
 }>;
 
+// Component to add attachment button inside PromptInput context
+function AttachmentButton() {
+  const attachments = usePromptInputAttachments();
+
+  return (
+    <PromptInputButton
+      variant="ghost"
+      size="icon-sm"
+      onClick={() => attachments.openFileDialog()}
+    >
+      <PaperclipIcon className="text-muted-foreground" size={16} />
+    </PromptInputButton>
+  );
+}
+
 export function ChatPanel() {
   const {
     problemText,
@@ -59,7 +92,6 @@ export function ChatPanel() {
     canvasScreenshot,
     addProposedAnnotation,
   } = useProblem();
-  const [input, setInput] = useState("");
   const greetingSentRef = useRef(false);
   const lastMessageTimeRef = useRef<number>(0);
   const processedToolCallIdsRef = useRef<Set<string>>(new Set());
@@ -226,53 +258,69 @@ export function ChatPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasScreenshot]);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (input.trim() && !isLoading) {
-      lastMessageTimeRef.current = Date.now();
-
-      // If debug mode is on, add mock messages instead of calling API
-      if (isDebugMode) {
-        const userMessage: UIMessage = {
-          id: crypto.randomUUID(),
-          role: "user",
-          parts: [{ type: "text", text: input }],
-        };
-
-        const mockAssistantMessage: UIMessage = {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          parts: [
-            {
-              type: "text",
-              text: "[DEBUG MODE] This is a mock AI response. AI is currently disabled.",
-            },
-          ],
-        };
-
-        setDebugMessages((prev) => [
-          ...prev,
-          userMessage,
-          mockAssistantMessage,
-        ]);
-        setInput("");
-        return;
-      }
-
-      sendMessage(
-        { text: input },
-        {
-          body: {
-            problem: {
-              text: problemText || undefined,
-              imageUrl: problemImage?.url || undefined,
-            },
-            screenshot: canvasScreenshot || undefined,
-          },
-        },
-      );
-      setInput("");
+  const onSubmit = async (message: PromptInputMessage) => {
+    if (!message.text.trim() && message.files.length === 0) {
+      return;
     }
+
+    if (isLoading) {
+      return;
+    }
+
+    lastMessageTimeRef.current = Date.now();
+
+    // If debug mode is on, add mock messages instead of calling API
+    if (isDebugMode) {
+      const userMessage: UIMessage = {
+        id: crypto.randomUUID(),
+        role: "user",
+        parts: [
+          { type: "text", text: message.text },
+          ...message.files.map((file) => ({
+            type: "file" as const,
+            url: file.url,
+            mediaType: file.mediaType,
+            filename: file.filename,
+          })),
+        ],
+      };
+
+      const mockAssistantMessage: UIMessage = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        parts: [
+          {
+            type: "text",
+            text: "[DEBUG MODE] This is a mock AI response. AI is currently disabled.",
+          },
+        ],
+      };
+
+      setDebugMessages((prev) => [...prev, userMessage, mockAssistantMessage]);
+      return;
+    }
+
+    // Upload files to storage (currently dataURL, future: S3)
+    const fileReferences = await uploadFiles(message.files);
+
+    // Send message with file attachments
+    // Note: Vercel AI SDK expects 'files' property for attachments
+    sendMessage(
+      {
+        text: message.text,
+        files: message.files,
+      },
+      {
+        body: {
+          problem: {
+            text: problemText || undefined,
+            imageUrl: problemImage?.url || undefined,
+          },
+          screenshot: canvasScreenshot || undefined,
+          fileReferences, // Include storage references for future use
+        },
+      },
+    );
   };
 
   // Combine real messages with debug messages
@@ -359,6 +407,46 @@ export function ChatPanel() {
                               );
                             }
 
+                            // Render file attachments (images/PDFs)
+                            if (part.type === "file") {
+                              const filePart = part as FileUIPart;
+                              const isImage =
+                                filePart.mediaType?.startsWith("image/");
+
+                              if (isImage && filePart.url) {
+                                return (
+                                  <div
+                                    key={index}
+                                    className="mt-2 max-w-xs rounded-lg overflow-hidden border border-gray-200"
+                                  >
+                                    <img
+                                      src={filePart.url}
+                                      alt={filePart.filename || "Attachment"}
+                                      className="w-full h-auto"
+                                    />
+                                    {filePart.filename && (
+                                      <div className="px-2 py-1 bg-gray-50 text-xs text-gray-600">
+                                        {filePart.filename}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+
+                              // For non-image files (like PDFs), show a file indicator
+                              return (
+                                <div
+                                  key={index}
+                                  className="mt-2 flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-sm"
+                                >
+                                  <span className="text-gray-600">📎</span>
+                                  <span className="text-gray-900">
+                                    {filePart.filename || "Attachment"}
+                                  </span>
+                                </div>
+                              );
+                            }
+
                             // Render tool calls
                             const isToolCall =
                               (part.type === "tool-call" &&
@@ -431,26 +519,35 @@ export function ChatPanel() {
             </Conversation>
 
             {/* Input */}
-            <form onSubmit={onSubmit} className="border-t border-gray-200 p-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask a question..."
+            <PromptInput
+              onSubmit={onSubmit}
+              accept="image/*,application/pdf"
+              multiple
+            >
+              <PromptInputHeader>
+                <PromptInputAttachments>
+                  {(attachment) => (
+                    <PromptInputAttachment
+                      key={attachment.id}
+                      data={attachment}
+                    />
+                  )}
+                </PromptInputAttachments>
+              </PromptInputHeader>
+              <PromptInputBody>
+                <PromptInputTextarea
+                  placeholder="Ask a question or upload an image/PDF..."
                   disabled={isLoading}
-                  className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:bg-gray-50 disabled:text-gray-500"
                 />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={!input.trim() || isLoading}
-                  className="shrink-0"
-                >
-                  <SendHorizontalIcon className="size-4" />
-                </Button>
-              </div>
-            </form>
+              </PromptInputBody>
+              <PromptInputFooter>
+                <PromptInputTools />
+                <div className="flex items-center gap-2">
+                  <AttachmentButton />
+                  <PromptInputSubmit status={status} />
+                </div>
+              </PromptInputFooter>
+            </PromptInput>
           </motion.div>
         ) : (
           <motion.div
