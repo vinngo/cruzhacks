@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useProblem } from "@/lib/problem-context";
 import { TldrawEditorRef } from "@/components/TldrawEditor";
 import { AnnotationOverlay } from "./AnnotationOverlay";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
   ssr: false,
@@ -15,40 +16,43 @@ const TldrawEditor = dynamic(() => import("@/components/TldrawEditor"), {
   ),
 });
 
+const SCREENSHOT_DEBOUNCE_MS = 3000;
+const SCREENSHOT_INDEX = 1;
+
 export default function CanvasPanel() {
   const { setCanvasScreenshot } = useProblem();
   const editorRef = useRef<TldrawEditorRef>(null);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCanvasChange = useCallback(() => {
-    // Cancel previous timer if user resumes drawing (cancel-on-resume)
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
+  const captureScreenshot = useCallback(async () => {
+    if (!editorRef.current) {
+      console.warn("Canvas editor not available for screenshot capture");
+      return;
     }
 
-    // Set new debounce timer (4 seconds - middle of 3-5s range)
-    debounceTimerRef.current = setTimeout(async () => {
-      if (!editorRef.current) return;
+    try {
+      const result = await editorRef.current.captureScreenshot();
 
-      try {
-        const result = await editorRef.current.captureScreenshot();
-        if (result && result.length > 1) {
-          // Extract screenshot from result array [description, screenshot]
-          const screenshot = result[1];
-          if (screenshot) {
-            console.log(
-              "Canvas screenshot captured, length:",
-              screenshot.length,
-            );
-            console.log("Screenshot format:", screenshot.substring(0, 50));
-            setCanvasScreenshot(screenshot);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to capture screenshot:", error);
+      if (!result || !Array.isArray(result)) {
+        console.warn("Invalid screenshot result format");
+        return;
       }
-    }, 3000); // 3 seconds
+
+      const screenshot = result[SCREENSHOT_INDEX];
+
+      if (!screenshot || typeof screenshot !== "string") {
+        console.warn("Screenshot data not found in result");
+        return;
+      }
+
+      console.log("Canvas screenshot captured, length:", screenshot.length);
+      console.log("Screenshot format:", screenshot.substring(0, 50));
+      setCanvasScreenshot(screenshot);
+    } catch (error) {
+      console.error("Failed to capture canvas screenshot:", error instanceof Error ? error.message : error);
+    }
   }, [setCanvasScreenshot]);
+
+  const handleCanvasChange = useDebounce(captureScreenshot, SCREENSHOT_DEBOUNCE_MS);
 
   return (
     <div className="h-full relative">
